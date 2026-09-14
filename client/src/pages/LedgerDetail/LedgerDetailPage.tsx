@@ -67,9 +67,12 @@ interface NewRecordRow {
   content: string;
   expectedDate: string;
   mainExecutor: string;
-  imageUrl: string;
+  imageUrls: string[];
   imageUploading: boolean;
 }
+
+const MAX_IMAGE_SIZE = 600 * 1024; // 600KB
+const MAX_IMAGES_PER_RECORD = 2;
 
 const statusBadge: Record<ProgressStatus, { label: string; variant: string }> = {
   pending: { label: '待处理', variant: 'destructive' },
@@ -100,7 +103,7 @@ const LedgerDetailPage: React.FC = () => {
       content: '',
       expectedDate: '',
       mainExecutor: '',
-      imageUrl: '',
+      imageUrls: [],
       imageUploading: false,
     };
   };
@@ -164,10 +167,29 @@ const LedgerDetailPage: React.FC = () => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check image type
     if (!file.type.startsWith('image/')) {
       toast.error('请选择图片文件');
+      e.target.value = '';
       return;
     }
+
+    // Check image size (600KB limit)
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error(`图片大小超过限制，单张图片最大600KB（当前${Math.round(file.size / 1024)}KB）`);
+      e.target.value = '';
+      return;
+    }
+
+    // Check max images per record
+    const currentRow = newRows.find((r) => r.key === key);
+    if (currentRow && currentRow.imageUrls.length >= MAX_IMAGES_PER_RECORD) {
+      toast.error(`每条记录最多上传${MAX_IMAGES_PER_RECORD}张图片`);
+      e.target.value = '';
+      return;
+    }
+
     setNewRows((prev) =>
       prev.map((row) =>
         row.key === key ? { ...row, imageUploading: true } : row,
@@ -183,14 +205,14 @@ const LedgerDetailPage: React.FC = () => {
       setNewRows((prev) =>
         prev.map((row) =>
           row.key === key
-            ? { ...row, imageUrl: data.url, imageUploading: false }
+            ? { ...row, imageUrls: [...row.imageUrls, data.url], imageUploading: false }
             : row,
         ),
       );
       toast.success('图片上传成功');
     } catch (err) {
       logger.error(`图片上传失败: ${String(err)}`);
-      toast.error('图片上传失败，请重试');
+      toast.error('图片上传失败，请检查图片大小是否超过600KB');
       setNewRows((prev) =>
         prev.map((row) =>
           row.key === key ? { ...row, imageUploading: false } : row,
@@ -199,6 +221,16 @@ const LedgerDetailPage: React.FC = () => {
     } finally {
       e.target.value = '';
     }
+  };
+
+  const handleRemoveImage = (key: number, imageIndex: number) => {
+    setNewRows((prev) =>
+      prev.map((row) =>
+        row.key === key
+          ? { ...row, imageUrls: row.imageUrls.filter((_, i) => i !== imageIndex) }
+          : row,
+      ),
+    );
   };
 
   const addRow = () => {
@@ -226,7 +258,7 @@ const LedgerDetailPage: React.FC = () => {
           content: r.content.trim(),
           expectedDate: r.expectedDate || null,
           mainExecutor: r.mainExecutor.trim() || null,
-          imageUrls: r.imageUrl ? [r.imageUrl] : [],
+          imageUrls: r.imageUrls,
         })),
       });
       toast.success(`成功添加 ${validRows.length} 条记录`);
@@ -498,7 +530,7 @@ const LedgerDetailPage: React.FC = () => {
                     <TableHead>内容 *</TableHead>
                     <TableHead className="w-40">预计完成时间</TableHead>
                     <TableHead className="w-36">主要执行人</TableHead>
-                    <TableHead className="w-44">图片URL</TableHead>
+                    <TableHead className="w-48">图片（最多2张）</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -536,42 +568,60 @@ const LedgerDetailPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="file"
-                            accept="image/jpeg,image/png,image/jpg"
-                            onChange={(e) => handleImageUpload(row.key, e)}
-                            className="hidden"
-                            id={`img-upload-${row.key}`}
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => document.getElementById(`img-upload-${row.key}`)?.click()}
-                            disabled={row.imageUploading}
-                            className="shrink-0"
-                          >
-                            {row.imageUploading ? (
-                              <Spinner className="h-3 w-3 mr-1" />
-                            ) : (
-                              <Plus className="h-3 w-3 mr-1" />
-                            )}
-                            {row.imageUrl ? '换图' : '上传图片'}
-                          </Button>
-                          {row.imageUrl && (
-                            <div className="relative w-10 h-10 rounded border shrink-0 overflow-hidden">
-                              <Image
-                                src={row.imageUrl}
-                                alt="预览"
-                                className="w-full h-full object-cover"
-                              />
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/jpg"
+                              onChange={(e) => handleImageUpload(row.key, e)}
+                              className="hidden"
+                              id={`img-upload-${row.key}`}
+                              disabled={row.imageUrls.length >= MAX_IMAGES_PER_RECORD}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => document.getElementById(`img-upload-${row.key}`)?.click()}
+                              disabled={row.imageUploading || row.imageUrls.length >= MAX_IMAGES_PER_RECORD}
+                              className="shrink-0"
+                            >
+                              {row.imageUploading ? (
+                                <Spinner className="h-3 w-3 mr-1" />
+                              ) : (
+                                <Plus className="h-3 w-3 mr-1" />
+                              )}
+                              {row.imageUrls.length >= MAX_IMAGES_PER_RECORD
+                                ? `已达上限(${row.imageUrls.length}/${MAX_IMAGES_PER_RECORD})`
+                                : `上传图片(${row.imageUrls.length}/${MAX_IMAGES_PER_RECORD})`}
+                            </Button>
+                          </div>
+                          {row.imageUrls.length > 0 && (
+                            <div className="flex gap-1.5">
+                              {row.imageUrls.map((url, idx) => (
+                                <div
+                                  key={idx}
+                                  className="relative w-10 h-10 rounded border shrink-0 overflow-hidden group"
+                                >
+                                  <Image
+                                    src={url}
+                                    alt={`图片${idx + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage(row.key, idx)}
+                                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    aria-label="删除图片"
+                                  >
+                                    <span className="text-white text-xs">删除</span>
+                                  </button>
+                                </div>
+                              ))}
                             </div>
                           )}
-                          {row.imageUrl && (
-                            <span className="text-xs text-muted-foreground truncate max-w-[80px]">
-                              已上传
-                            </span>
-                          )}
+                          <span className="text-xs text-muted-foreground">
+                            单张≤600KB，JPG/PNG
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>

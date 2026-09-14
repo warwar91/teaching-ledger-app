@@ -31,7 +31,7 @@ export class UpdateRecordDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(20, { message: '图片不能超过20张' })
+  @ArrayMaxSize(2, { message: '每条记录最多上传2张图片' })
   @IsString({ each: true, message: '图片链接必须是字符串' })
   imageUrls?: string[];
 
@@ -62,7 +62,7 @@ export class CreateRecordItemDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(20, { message: '图片不能超过20张' })
+  @ArrayMaxSize(2, { message: '每条记录最多上传2张图片' })
   @IsString({ each: true, message: '图片链接必须是字符串' })
   imageUrls?: string[];
 
