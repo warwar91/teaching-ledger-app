@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
 import logoUrl from '@client/src/assets/logo.png';
+import campusBg from '@client/src/assets/campus-bg.jpg';
 
 import {
   Card,
@@ -82,8 +83,21 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div
+      className="min-h-screen w-full flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `url(${campusBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* 半透明白色蒙版层 */}
+      <div className="absolute inset-0 bg-white/75" />
+      {/* 渐变叠加，增强可读性 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 via-white/60 to-blue-100/50" />
+
+      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="mx-auto flex items-center justify-center">
             <img
