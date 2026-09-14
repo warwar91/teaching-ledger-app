@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import NotFound from './pages/NotFound/NotFound';
 import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Login/LoginPage';
+import RegisterPage from './pages/Register/RegisterPage';
 import LedgerListPage from './pages/LedgerList/LedgerListPage';
 import LedgerDetailPage from './pages/LedgerDetail/LedgerDetailPage';
 import RecycleBinPage from './pages/RecycleBin/RecycleBinPage';
@@ -17,6 +18,7 @@ const RoutesComponent = () => {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="weekly" element={<LedgerListPage ledgerType="weekly" />} />

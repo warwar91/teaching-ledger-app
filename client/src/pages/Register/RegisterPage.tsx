@@ -17,14 +17,15 @@ import { Button } from '@client/src/components/ui/button';
 import { Label } from '@client/src/components/ui/label';
 import { useAuth } from '@client/src/contexts/AuthContext';
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
-  const [loginUsername, setLoginUsername] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
-  const [loginSubmitting, setLoginSubmitting] = useState(false);
+  const [regUsername, setRegUsername] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [regPasswordVisible, setRegPasswordVisible] = useState(false);
+  const [regSubmitting, setRegSubmitting] = useState(false);
 
   const extractErrorMsg = (err: unknown): string => {
     if (
@@ -46,29 +47,37 @@ const LoginPage: React.FC = () => {
     return '请求失败，请稍后重试';
   };
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!loginUsername.trim()) {
+    if (!regUsername.trim()) {
       toast.error('请输入用户名');
       return;
     }
-    if (!loginPassword) {
+    if (!regPassword) {
       toast.error('请输入密码');
       return;
     }
-    setLoginSubmitting(true);
+    if (regPassword.length < 6) {
+      toast.error('密码至少6位');
+      return;
+    }
+    if (regPassword !== regConfirmPassword) {
+      toast.error('两次输入的密码不一致');
+      return;
+    }
+    setRegSubmitting(true);
     try {
-      await login({
-        username: loginUsername.trim(),
-        password: loginPassword,
+      await register({
+        username: regUsername.trim(),
+        password: regPassword,
       });
-      toast.success('登录成功');
+      toast.success('注册成功');
       navigate('/', { replace: true });
     } catch (err: unknown) {
-      logger.error(`Login failed: ${JSON.stringify(err)}`);
+      logger.error(`Register failed: ${JSON.stringify(err)}`);
       toast.error(extractErrorMsg(err));
     } finally {
-      setLoginSubmitting(false);
+      setRegSubmitting(false);
     }
   };
 
@@ -92,48 +101,48 @@ const LoginPage: React.FC = () => {
             </CardTitle>
           </div>
           <CardDescription>
-            登录账户以管理您的教学工作台账
+            注册新账户以管理您的教学工作台账
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="login-username">用户名</Label>
+              <Label htmlFor="reg-username">用户名</Label>
               <Input
-                id="login-username"
+                id="reg-username"
                 type="text"
                 placeholder="请输入用户名"
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
+                value={regUsername}
+                onChange={(e) => setRegUsername(e.target.value)}
                 autoComplete="username"
-                disabled={loginSubmitting}
+                disabled={regSubmitting}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="login-password">密码</Label>
+              <Label htmlFor="reg-password">密码</Label>
               <div className="relative">
                 <Input
-                  id="login-password"
-                  type={loginPasswordVisible ? 'text' : 'password'}
-                  placeholder="请输入密码"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  autoComplete="current-password"
-                  disabled={loginSubmitting}
+                  id="reg-password"
+                  type={regPasswordVisible ? 'text' : 'password'}
+                  placeholder="请输入密码（至少6位）"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  autoComplete="new-password"
+                  disabled={regSubmitting}
                   className="pr-10"
                 />
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   onClick={() =>
-                    setLoginPasswordVisible((v) => !v)
+                    setRegPasswordVisible((v) => !v)
                   }
                   tabIndex={-1}
                   aria-label={
-                    loginPasswordVisible ? '隐藏密码' : '显示密码'
+                    regPasswordVisible ? '隐藏密码' : '显示密码'
                   }
                 >
-                  {loginPasswordVisible ? (
+                  {regPasswordVisible ? (
                     <EyeOff className="h-4 w-4" />
                   ) : (
                     <Eye className="h-4 w-4" />
@@ -141,21 +150,33 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="reg-confirm-password">确认密码</Label>
+              <Input
+                id="reg-confirm-password"
+                type="password"
+                placeholder="请再次输入密码"
+                value={regConfirmPassword}
+                onChange={(e) => setRegConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                disabled={regSubmitting}
+              />
+            </div>
             <Button
               type="submit"
               className="w-full"
-              disabled={loginSubmitting}
+              disabled={regSubmitting}
             >
-              {loginSubmitting && (
+              {regSubmitting && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              {loginSubmitting ? '登录中...' : '登录'}
+              {regSubmitting ? '注册中...' : '注册'}
             </Button>
           </form>
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            还没有账号？{' '}
-            <Link to="/register" className="text-primary hover:underline">
-              立即注册
+            已有账号？{' '}
+            <Link to="/login" className="text-primary hover:underline">
+              立即登录
             </Link>
           </div>
         </CardContent>
@@ -164,4 +185,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

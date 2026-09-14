@@ -26,7 +26,6 @@ import {
   DropdownMenuTrigger,
 } from '@client/src/components/ui/dropdown-menu';
 import { useAuth } from '@client/src/contexts/AuthContext';
-import { Image } from '@client/src/components/ui/image';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
@@ -69,7 +68,7 @@ const Layout: React.FC = () => {
       <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
         {/* Logo */}
         <div className="flex h-14 items-center gap-3 border-b border-sidebar-border px-4">
-          <Image
+          <img
             src={logoUrl}
             alt="学院LOGO"
             className="h-9 w-9 rounded-full object-cover shadow-sm"
