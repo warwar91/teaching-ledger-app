@@ -3,6 +3,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Request, Response, NextFunction } from 'express';
+import compression from 'compression';
 import fs from 'fs';
 
 import { AppModule } from './app.module';
@@ -18,6 +19,8 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  app.use(compression());
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

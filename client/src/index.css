@@ -2,4 +2,4 @@
 @import "./tailwind-theme.css";
 @import "./typography.css";
 
-@config "../../tailwind.config.ts";
+@config "../tailwind.config.ts";

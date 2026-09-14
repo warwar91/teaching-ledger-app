@@ -29,9 +29,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, 'dist/client'),
     emptyOutDir: true,
+    minify: 'esbuild',
+    cssMinify: true,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'client/index.html'),
+      },
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['lucide-react', 'sonner'],
+        },
       },
     },
   },
