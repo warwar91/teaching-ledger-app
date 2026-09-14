@@ -126,10 +126,10 @@ const LoginPage: React.FC = () => {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="mx-auto flex items-center justify-center">
-            <Image
+            <img
               src={logoUrl}
               alt="河南开封科技传媒学院 经济学院"
-              className="h-28 w-28 rounded-full object-cover shadow-md"
+              style={{ width: '112px', height: '112px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
             />
           </div>
           <div className="space-y-1">
