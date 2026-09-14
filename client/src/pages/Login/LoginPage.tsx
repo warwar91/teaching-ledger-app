@@ -1,0 +1,290 @@
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { logger } from '@client/src/utils/logger';
+import logoUrl from '@client/src/assets/logo.png';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/src/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/src/components/ui/tabs';
+import { Input } from '@client/src/components/ui/input';
+import { Button } from '@client/src/components/ui/button';
+import { Label } from '@client/src/components/ui/label';
+import { useAuth } from '@client/src/contexts/AuthContext';
+import { Image } from '@client/src/components/ui/image';
+
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { login, register } = useAuth();
+
+  // Login form state
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
+  const [loginSubmitting, setLoginSubmitting] = useState(false);
+
+  // Register form state
+  const [regUsername, setRegUsername] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [regPasswordVisible, setRegPasswordVisible] = useState(false);
+  const [regSubmitting, setRegSubmitting] = useState(false);
+
+  const extractErrorMsg = (err: unknown): string => {
+    if (
+      err &&
+      typeof err === 'object' &&
+      'response' in err &&
+      err.response &&
+      typeof err.response === 'object'
+    ) {
+      const resp = err.response as Record<string, unknown>;
+      const data = resp.data as Record<string, unknown> | undefined;
+      if (data && typeof data.message === 'string') return data.message;
+      if (data && typeof data.error === 'string') return data.error;
+      if (typeof resp.statusText === 'string' && resp.statusText) {
+        return resp.statusText;
+      }
+    }
+    if (err instanceof Error) return err.message;
+    return '请求失败，请稍后重试';
+  };
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!loginUsername.trim()) {
+      toast.error('请输入用户名');
+      return;
+    }
+    if (!loginPassword) {
+      toast.error('请输入密码');
+      return;
+    }
+    setLoginSubmitting(true);
+    try {
+      await login({
+        username: loginUsername.trim(),
+        password: loginPassword,
+      });
+      toast.success('登录成功');
+      navigate('/', { replace: true });
+    } catch (err: unknown) {
+      logger.error(`Login failed: ${JSON.stringify(err)}`);
+      toast.error(extractErrorMsg(err));
+    } finally {
+      setLoginSubmitting(false);
+    }
+  };
+
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!regUsername.trim()) {
+      toast.error('请输入用户名');
+      return;
+    }
+    if (!regPassword) {
+      toast.error('请输入密码');
+      return;
+    }
+    if (regPassword.length < 6) {
+      toast.error('密码至少6位');
+      return;
+    }
+    if (regPassword !== regConfirmPassword) {
+      toast.error('两次输入的密码不一致');
+      return;
+    }
+    setRegSubmitting(true);
+    try {
+      await register({
+        username: regUsername.trim(),
+        password: regPassword,
+      });
+      toast.success('注册成功');
+      navigate('/', { replace: true });
+    } catch (err: unknown) {
+      logger.error(`Register failed: ${JSON.stringify(err)}`);
+      toast.error(extractErrorMsg(err));
+    } finally {
+      setRegSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-3 pb-8">
+          <div className="mx-auto flex items-center justify-center">
+            <Image
+              src={logoUrl}
+              alt="河南开封科技传媒学院 经济学院"
+              className="h-28 w-28 rounded-full object-cover shadow-md"
+            />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">
+              河南开封科技传媒学院 经济学院
+            </p>
+            <CardTitle className="text-xl font-semibold text-foreground">
+              教学工作台账管理系统
+            </CardTitle>
+          </div>
+          <CardDescription>
+            登录账户以管理您的教学工作台账
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="login">登录</TabsTrigger>
+              <TabsTrigger value="register">注册</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="login">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-username">用户名</Label>
+                  <Input
+                    id="login-username"
+                    type="text"
+                    placeholder="请输入用户名"
+                    value={loginUsername}
+                    onChange={(e) => setLoginUsername(e.target.value)}
+                    autoComplete="username"
+                    disabled={loginSubmitting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="login-password">密码</Label>
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={loginPasswordVisible ? 'text' : 'password'}
+                      placeholder="请输入密码"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      autoComplete="current-password"
+                      disabled={loginSubmitting}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() =>
+                        setLoginPasswordVisible((v) => !v)
+                      }
+                      tabIndex={-1}
+                      aria-label={
+                        loginPasswordVisible ? '隐藏密码' : '显示密码'
+                      }
+                    >
+                      {loginPasswordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loginSubmitting}
+                >
+                  {loginSubmitting && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  {loginSubmitting ? '登录中...' : '登录'}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="register">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reg-username">用户名</Label>
+                  <Input
+                    id="reg-username"
+                    type="text"
+                    placeholder="请输入用户名"
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value)}
+                    autoComplete="username"
+                    disabled={regSubmitting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-password">密码</Label>
+                  <div className="relative">
+                    <Input
+                      id="reg-password"
+                      type={regPasswordVisible ? 'text' : 'password'}
+                      placeholder="请输入密码（至少6位）"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      autoComplete="new-password"
+                      disabled={regSubmitting}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() =>
+                        setRegPasswordVisible((v) => !v)
+                      }
+                      tabIndex={-1}
+                      aria-label={
+                        regPasswordVisible ? '隐藏密码' : '显示密码'
+                      }
+                    >
+                      {regPasswordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-confirm-password">确认密码</Label>
+                  <Input
+                    id="reg-confirm-password"
+                    type="password"
+                    placeholder="请再次输入密码"
+                    value={regConfirmPassword}
+                    onChange={(e) => setRegConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    disabled={regSubmitting}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={regSubmitting}
+                >
+                  {regSubmitting && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  {regSubmitting ? '注册中...' : '注册'}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default LoginPage;
