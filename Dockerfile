@@ -1,4 +1,4 @@
-FROM node:20-alpine AS client-build
+FROM node:22-alpine AS client-build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -13,7 +13,7 @@ COPY components.json ./
 
 RUN npm run build:client
 
-FROM node:20-alpine AS server-build
+FROM node:22-alpine AS server-build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -26,7 +26,7 @@ COPY tsconfig.json tsconfig.node.json tsconfig.app.json ./
 
 RUN npm run build:server
 
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
