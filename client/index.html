@@ -6,19 +6,9 @@
   <link rel="icon" type="image/png" href="/logo.png">
   <title>教学工作台账管理系统 - 河南开封科技传媒学院 经济学院</title>
 </head>
-<body>
+<body style="margin:0;padding:0;">
   <div id="root"></div>
-  <div id="inline-test" style="position:fixed;top:10px;left:10px;background:yellow;padding:10px;z-index:99999;">内联测试: HTML正常加载</div>
-  <script>
-    // 内联测试脚本 - 直接执行
-    (function() {
-      var testDiv = document.getElementById('inline-test');
-      if (testDiv) {
-        testDiv.textContent = '内联JS测试: JavaScript正常执行';
-      }
-      console.log('内联JS测试: JavaScript正常执行');
-    })();
-  </script>
+  <div id="html-test" style="position:fixed;top:0;left:0;width:100%;height:100px;background:red;color:white;font-size:24px;padding:20px;z-index:999999;">HTML测试：如果你能看到这个红色条，说明HTML正常加载</div>
   <script type="module" src="/src/index.tsx"></script>
 </body>
 </html>
