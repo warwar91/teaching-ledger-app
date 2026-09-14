@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/logo.png">
   <title>教学工作台账管理系统 - 河南开封科技传媒学院 经济学院</title>
-  <script>
-    // 内联测试脚本
-    window.addEventListener('DOMContentLoaded', function() {
-      var testDiv = document.createElement('div');
-      testDiv.id = 'inline-test';
-      testDiv.style.cssText = 'position:fixed;top:10px;left:10px;background:yellow;padding:10px;z-index:99999;';
-      testDiv.textContent = '内联JS测试: JavaScript正常执行';
-      document.body.appendChild(testDiv);
-      console.log('内联JS测试: JavaScript正常执行');
-    });
-  </script>
 </head>
 <body>
   <div id="root"></div>
+  <div id="inline-test" style="position:fixed;top:10px;left:10px;background:yellow;padding:10px;z-index:99999;">内联测试: HTML正常加载</div>
+  <script>
+    // 内联测试脚本 - 直接执行
+    (function() {
+      var testDiv = document.getElementById('inline-test');
+      if (testDiv) {
+        testDiv.textContent = '内联JS测试: JavaScript正常执行';
+      }
+      console.log('内联JS测试: JavaScript正常执行');
+    })();
+  </script>
   <script type="module" src="/src/index.tsx"></script>
 </body>
 </html>
