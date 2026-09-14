@@ -93,11 +93,11 @@ const RegisterPage: React.FC = () => {
       }}
     >
       {/* 半透明白色蒙版层 */}
-      <div className="absolute inset-0 bg-white/75" />
+      <div className="absolute inset-0 bg-white/60" />
       {/* 渐变叠加，增强可读性 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 via-white/60 to-blue-100/50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/40 via-white/50 to-blue-100/40" />
 
-      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-white/95 backdrop-blur-sm">
+      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-white/90 backdrop-blur-sm">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="mx-auto flex items-center justify-center">
             <img
