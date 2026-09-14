@@ -21,7 +21,15 @@ export type DbType = PostgresJsDatabase;
         if (!databaseUrl) {
           throw new Error('DATABASE_URL environment variable is required');
         }
-        const queryClient = postgres(databaseUrl, {
+
+        // Parse connection string to handle URL-encoded credentials properly
+        const url = new URL(databaseUrl);
+        const queryClient = postgres({
+          host: url.hostname,
+          port: parseInt(url.port, 10) || 5432,
+          database: url.pathname.slice(1),
+          username: decodeURIComponent(url.username),
+          password: decodeURIComponent(url.password),
           ssl: { rejectUnauthorized: false },
           max: 10,
         });
