@@ -11,6 +11,9 @@ import LedgerDetailPage from './pages/LedgerDetail/LedgerDetailPage';
 import RecycleBinPage from './pages/RecycleBin/RecycleBinPage';
 import AdminPage from './pages/Admin/AdminPage';
 import HelpPage from './pages/Help/HelpPage';
+import AnnouncementListPage from './pages/Announcement/AnnouncementListPage';
+import AnnouncementDetailPage from './pages/Announcement/AnnouncementDetailPage';
+import AdminAnnouncementPage from './pages/Announcement/AdminAnnouncementPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 const RoutesComponent = () => {
@@ -27,6 +30,9 @@ const RoutesComponent = () => {
           <Route path="ledger/:id" element={<LedgerDetailPage />} />
           <Route path="admin" element={<AdminPage />} />
           <Route path="help" element={<HelpPage />} />
+          <Route path="announcements" element={<AnnouncementListPage />} />
+          <Route path="announcements/:id" element={<AnnouncementDetailPage />} />
+          <Route path="admin/announcements" element={<AdminAnnouncementPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

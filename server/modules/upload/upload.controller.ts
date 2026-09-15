@@ -51,4 +51,38 @@ export class UploadController {
     }
     return { url: `/uploads/${file.filename}` };
   }
+
+  @Post('attachment')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: uploadDir,
+      filename: (_req: unknown, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+        const ext: string = extname(file.originalname).toLowerCase();
+        const uniqueName: string = `${uuidv4()}${ext}`;
+        cb(null, uniqueName);
+      },
+    }),
+    fileFilter: (_req: unknown, file: Express.Multer.File, cb: (error: Error | null, acceptFile: boolean) => void) => {
+      const allowedTypes: string[] = [
+        'image/jpeg', 'image/png',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new BadRequestException('只允许上传 JPG/PNG/PDF/Word 格式文件'), false);
+      }
+    },
+    limits: {
+      fileSize: 2 * 1024 * 1024,
+    },
+  }))
+  uploadAttachment(@UploadedFile() file: Express.Multer.File): { url: string; originalName: string } {
+    if (!file) {
+      throw new BadRequestException('未找到上传文件');
+    }
+    return { url: `/uploads/${file.filename}`, originalName: file.originalname };
+  }
 }

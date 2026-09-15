@@ -6,6 +6,7 @@ import { LedgerModule } from './modules/ledger/ledger.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { ViewModule } from './modules/view/view.module';
+import { AnnouncementModule } from './modules/announcement/announcement.module';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
@@ -22,6 +23,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     AdminModule,
     UploadModule,
     ViewModule,
+    AnnouncementModule,
   ],
   providers: [
     {

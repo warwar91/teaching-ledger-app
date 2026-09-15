@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Megaphone,
   Settings,
   Trash2,
   X,
@@ -65,6 +66,7 @@ const Layout: React.FC = () => {
     { path: '/', label: '首页', icon: LayoutDashboard, end: true },
     { path: '/weekly', label: '周台账', icon: CalendarDays, end: false },
     { path: '/semester', label: '学期台账', icon: GraduationCap, end: false },
+    { path: '/announcements', label: '公告通知', icon: Megaphone, end: false },
     { path: '/recycle', label: '回收站', icon: Trash2, end: false },
     { path: '/help', label: '使用说明', icon: HelpCircle, end: false },
   ];

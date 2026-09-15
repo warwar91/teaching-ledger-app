@@ -116,6 +116,29 @@ export const ledgerRecord = pgTable('ledger_record', {
   }).onDelete('cascade'),
 ]);
 
+export const announcement = pgTable('announcement', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: varchar('title', { length: 255 }).notNull(),
+  content: text('content').notNull(),
+  publisher: varchar('publisher', { length: 100 }),
+  publishDate: timestamp('publish_date', { withTimezone: true, precision: 3 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  attachmentUrl: varchar('attachment_url', { length: 500 }),
+  attachmentName: varchar('attachment_name', { length: 255 }),
+  isPublished: boolean('is_published').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true, precision: 3 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  createdBy: varchar('created_by', { length: 64 }),
+  updatedAt: timestamp('updated_at', { withTimezone: true, precision: 3 })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedBy: varchar('updated_by', { length: 64 }),
+}, (table) => [
+  index('idx_announcement_publish_date').on(table.publishDate),
+]);
+
 export const appUserTable = appUser;
 export const appSessionTable = appSession;
 export const ledgerTable = ledger;
