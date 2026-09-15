@@ -1,27 +1,25 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { DRIZZLE_DATABASE } from '@server/database/database.module';
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { sql } from 'drizzle-orm';
+import { PG_CLIENT } from '@server/database/database.module';
 
 @Injectable()
 export class AnnouncementService {
-  constructor(@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase) {}
+  constructor(@Inject(PG_CLIENT) private readonly pg: any) {}
 
   async findAll(page: number = 1, pageSize: number = 12) {
     const offset = (page - 1) * pageSize;
-    const rows = await this.db.execute(sql`
+    const rows = await this.pg`
       SELECT id, title, publisher, publish_date
       FROM announcement
       WHERE is_published = true
       ORDER BY publish_date DESC
       LIMIT ${pageSize} OFFSET ${offset}
-    `);
+    `;
 
-    const countResult = await this.db.execute(sql`
-      SELECT COUNT(*) as total FROM announcement WHERE is_published = true
-    `);
+    const countResult = await this.pg`
+      SELECT COUNT(*)::int as total FROM announcement WHERE is_published = true
+    `;
 
-    const total = Number((countResult[0] as any)?.total || 0);
+    const total = Number(countResult[0]?.total || 0);
     return {
       list: rows,
       total,
@@ -32,10 +30,10 @@ export class AnnouncementService {
   }
 
   async findOne(id: string) {
-    const rows = await this.db.execute(sql`
+    const rows = await this.pg`
       SELECT * FROM announcement WHERE id = ${id}::uuid LIMIT 1
-    `);
-    if ((rows as any[]).length === 0) {
+    `;
+    if (rows.length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return rows[0];
@@ -49,7 +47,7 @@ export class AnnouncementService {
     attachmentName?: string;
     createdBy?: string;
   }) {
-    const rows = await this.db.execute(sql`
+    const rows = await this.pg`
       INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by)
       VALUES (
         ${data.title},
@@ -60,7 +58,7 @@ export class AnnouncementService {
         ${data.createdBy || null}
       )
       RETURNING *
-    `);
+    `;
     return rows[0];
   }
 
@@ -73,7 +71,7 @@ export class AnnouncementService {
     isPublished?: boolean;
     updatedBy?: string;
   }) {
-    const rows = await this.db.execute(sql`
+    const rows = await this.pg`
       UPDATE announcement SET
         title = COALESCE(${data.title || null}, title),
         content = COALESCE(${data.content || null}, content),
@@ -85,26 +83,26 @@ export class AnnouncementService {
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${id}::uuid
       RETURNING *
-    `);
-    if ((rows as any[]).length === 0) {
+    `;
+    if (rows.length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return rows[0];
   }
 
   async remove(id: string) {
-    const rows = await this.db.execute(sql`
+    const rows = await this.pg`
       DELETE FROM announcement WHERE id = ${id}::uuid RETURNING id
-    `);
-    if ((rows as any[]).length === 0) {
+    `;
+    if (rows.length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return { success: true };
   }
 
   async adminFindAll() {
-    return this.db.execute(sql`
+    return this.pg`
       SELECT * FROM announcement ORDER BY publish_date DESC
-    `);
+    `;
   }
 }
