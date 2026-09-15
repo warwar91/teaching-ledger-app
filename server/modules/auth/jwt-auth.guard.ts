@@ -11,7 +11,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { eq, and } from 'drizzle-orm';
 import { appSession, appUser } from '@server/schema';
 
-const SESSION_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

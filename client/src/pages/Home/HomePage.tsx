@@ -124,7 +124,7 @@ const HomePage: React.FC = () => {
           欢迎回来，{user?.username || '用户'}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          高效管理您的教学工作台账
+          高效管理您的工作台账
         </p>
       </div>
 

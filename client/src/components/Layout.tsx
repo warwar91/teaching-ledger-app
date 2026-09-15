@@ -82,12 +82,8 @@ const Layout: React.FC = () => {
       toast.error('请填写完整所有字段');
       return;
     }
-    if (newPwd.length < 8 || newPwd.length > 128) {
-      toast.error('新密码长度需为 8~128 位');
-      return;
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPwd)) {
-      toast.error('新密码必须同时包含大小写字母和数字');
+    if (newPwd.length < 8 || newPwd.length > 12) {
+      toast.error('新密码长度需为 8~12 位');
       return;
     }
     if (newPwd !== confirmPwd) {
@@ -141,7 +137,7 @@ const Layout: React.FC = () => {
         />
         <div className="flex flex-col min-w-0">
           <span className="text-sm sm:text-base font-semibold text-gray-900 leading-tight truncate">
-            教学工作台账
+            工作台账
           </span>
           <span className="text-xs sm:text-sm text-gray-500 leading-tight">
             经济学院
@@ -216,7 +212,7 @@ const Layout: React.FC = () => {
               <Menu className="h-5 w-5" />
             </button>
             <div className="text-sm sm:text-base font-semibold text-gray-900">
-              教学工作台账管理系统
+              工作台账管理系统
             </div>
           </div>
 
@@ -328,7 +324,7 @@ const Layout: React.FC = () => {
                 type="password"
                 value={newPwd}
                 onChange={(e) => setNewPwd(e.target.value)}
-                placeholder="8~128位，含大小写字母和数字"
+                placeholder="8~12位，可含字母数字特殊字符"
                 className="mt-1.5 border-gray-200"
                 autoComplete="new-password"
               />

@@ -75,8 +75,8 @@ const RegisterPage: React.FC = () => {
       toast.error('请输入密码');
       return;
     }
-    if (regPassword.length < 6) {
-      toast.error('密码至少6位');
+    if (regPassword.length < 8 || regPassword.length > 12) {
+      toast.error('密码长度需为8~12位');
       return;
     }
     if (regPassword !== regConfirmPassword) {
@@ -128,11 +128,11 @@ const RegisterPage: React.FC = () => {
               河南开封科技传媒学院 经济学院
             </p>
             <CardTitle className="text-xl font-semibold text-gray-900">
-              教学工作台账管理系统
+              工作台账管理系统
             </CardTitle>
           </div>
           <CardDescription className="text-gray-500">
-            注册新账户以管理您的教学工作台账
+            注册新账户以管理您的工作台账
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -157,7 +157,7 @@ const RegisterPage: React.FC = () => {
                 <Input
                   id="reg-password"
                   type={regPasswordVisible ? 'text' : 'password'}
-                  placeholder="请输入密码（至少8位，含大小写字母+数字）"
+                  placeholder="请输入密码（8~12位，字母/数字/符号任意组合）"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   autoComplete="new-password"

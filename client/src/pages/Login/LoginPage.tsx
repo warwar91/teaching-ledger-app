@@ -145,11 +145,11 @@ const LoginPage: React.FC = () => {
               河南开封科技传媒学院 经济学院
             </p>
             <CardTitle className="text-xl font-semibold text-gray-900">
-              教学工作台账管理系统
+              工作台账管理系统
             </CardTitle>
           </div>
           <CardDescription className="text-gray-500">
-            登录账户以管理您的教学工作台账
+            登录账户以管理您的工作台账
           </CardDescription>
         </CardHeader>
         <CardContent>
