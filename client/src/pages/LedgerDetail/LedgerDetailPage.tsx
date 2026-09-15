@@ -65,6 +65,7 @@ import { http } from '@client/src/api/instance';
 interface NewRecordRow {
   key: number;
   content: string;
+  remark: string;
   expectedDate: string;
   mainExecutor: string;
   imageUrls: string[];
@@ -74,10 +75,25 @@ interface NewRecordRow {
 const MAX_IMAGE_SIZE = 600 * 1024; // 600KB
 const MAX_IMAGES_PER_RECORD = 2;
 
-const statusBadge: Record<ProgressStatus, { label: string; variant: string }> = {
-  pending: { label: '待处理', variant: 'destructive' },
-  in_progress: { label: '进行中', variant: 'secondary' },
-  completed: { label: '已完成', variant: 'default' },
+// 计算记录状态样式：正常待处理、临期、逾期、已完成
+const getStatusStyle = (record: LedgerRecordItem) => {
+  if (record.progressStatus === 'completed') {
+    return { badgeClass: 'bg-green-100 text-green-700 border-green-200', label: '已完成' };
+  }
+  if (!record.expectedDate) {
+    return { badgeClass: 'bg-gray-100 text-gray-700 border-gray-200', label: record.progressStatus === 'pending' ? '待处理' : '进行中' };
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueDate = new Date(record.expectedDate);
+  const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) {
+    return { badgeClass: 'bg-red-100 text-red-700 border-red-300 font-semibold', label: `已逾期${Math.abs(diffDays)}天` };
+  }
+  if (diffDays <= 2) {
+    return { badgeClass: 'bg-orange-100 text-orange-700 border-orange-300', label: diffDays === 0 ? '今天到期' : `${diffDays}天内到期` };
+  }
+  return { badgeClass: 'bg-blue-100 text-blue-700 border-blue-200', label: record.progressStatus === 'pending' ? '待处理' : '进行中' };
 };
 
 const REMINDER_SHOWN_KEY = 'ledger_reminder_shown';
@@ -101,6 +117,7 @@ const LedgerDetailPage: React.FC = () => {
     return {
       key: keyCounter.current,
       content: '',
+      remark: '',
       expectedDate: '',
       mainExecutor: '',
       imageUrls: [],
@@ -256,6 +273,7 @@ const LedgerDetailPage: React.FC = () => {
       await ledger.addRecords(id, {
         records: validRows.map((r) => ({
           content: r.content.trim(),
+          remark: r.remark.trim() || null,
           expectedDate: r.expectedDate || null,
           mainExecutor: r.mainExecutor.trim() || null,
           imageUrls: r.imageUrls,
@@ -417,16 +435,19 @@ const LedgerDetailPage: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-14 text-center">序号</TableHead>
+                    <TableHead className="w-12 text-center">序号</TableHead>
                     <TableHead>内容</TableHead>
-                    <TableHead className="w-32">预计完成时间</TableHead>
-                    <TableHead className="w-28">主要执行人</TableHead>
-                    <TableHead className="w-24">进度状态</TableHead>
-                    <TableHead className="w-32 text-right">操作</TableHead>
+                    <TableHead className="w-40">备注</TableHead>
+                    <TableHead className="w-28">预计完成</TableHead>
+                    <TableHead className="w-24">执行人</TableHead>
+                    <TableHead className="w-28">状态</TableHead>
+                    <TableHead className="w-24 text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {detail?.records.map((record: LedgerRecordItem) => (
+                  {detail?.records.map((record: LedgerRecordItem) => {
+                    const style = getStatusStyle(record);
+                    return (
                     <TableRow key={record.id}>
                       <TableCell className="text-center text-muted-foreground">
                         {record.seqNo}
@@ -437,7 +458,7 @@ const LedgerDetailPage: React.FC = () => {
                         </div>
                         {record.imageUrls && record.imageUrls.length > 0 && (
                           <div className="mt-1 flex gap-1">
-                            {record.imageUrls.slice(0, 3).map((url, idx) => (
+                            {record.imageUrls.slice(0, 2).map((url, idx) => (
                               <a
                                 key={idx}
                                 href={url}
@@ -451,17 +472,21 @@ const LedgerDetailPage: React.FC = () => {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>{record.expectedDate || '-'}</TableCell>
-                      <TableCell>{record.mainExecutor || '-'}</TableCell>
+                      <TableCell className="max-w-[160px]">
+                        {record.remark ? (
+                          <div className="truncate text-xs text-muted-foreground" title={record.remark}>
+                            {record.remark}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/50">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm">{record.expectedDate || '-'}</TableCell>
+                      <TableCell className="text-sm">{record.mainExecutor || '-'}</TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            statusBadge[record.progressStatus]
-                              .variant as 'default' | 'secondary' | 'destructive'
-                          }
-                        >
-                          {statusBadge[record.progressStatus].label}
-                        </Badge>
+                        <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${style.badgeClass}`}>
+                          {style.label}
+                        </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -505,7 +530,8 @@ const LedgerDetailPage: React.FC = () => {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}
@@ -526,12 +552,13 @@ const LedgerDetailPage: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-14 text-center">#</TableHead>
+                    <TableHead className="w-10 text-center">#</TableHead>
                     <TableHead>内容 *</TableHead>
-                    <TableHead className="w-40">预计完成时间</TableHead>
-                    <TableHead className="w-36">主要执行人</TableHead>
-                    <TableHead className="w-48">图片（最多2张）</TableHead>
-                    <TableHead className="w-12"></TableHead>
+                    <TableHead className="w-36">备注</TableHead>
+                    <TableHead className="w-32">预计完成</TableHead>
+                    <TableHead className="w-28">执行人</TableHead>
+                    <TableHead className="w-40">图片（最多2张）</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -546,6 +573,15 @@ const LedgerDetailPage: React.FC = () => {
                           value={row.content}
                           onChange={(e) =>
                             updateRow(row.key, 'content', e.target.value)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          placeholder="备注（可选）"
+                          value={row.remark}
+                          onChange={(e) =>
+                            updateRow(row.key, 'remark', e.target.value)
                           }
                         />
                       </TableCell>

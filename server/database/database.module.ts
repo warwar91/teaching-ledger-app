@@ -33,6 +33,12 @@ export type DbType = PostgresJsDatabase;
           ssl: { rejectUnauthorized: false },
           max: 10,
         });
+
+        // Run lightweight migrations on startup (idempotent)
+        queryClient`ALTER TABLE ledger_record ADD COLUMN IF NOT EXISTS remark text`.catch((err: unknown) => {
+          console.error('Migration failed: add remark column', err);
+        });
+
         return drizzle(queryClient);
       },
     },

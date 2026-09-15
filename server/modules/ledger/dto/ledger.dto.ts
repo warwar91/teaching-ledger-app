@@ -30,6 +30,11 @@ export class UpdateRecordDto {
   content?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(1000, { message: '备注不能超过1000个字符' })
+  remark?: string | null;
+
+  @IsOptional()
   @IsArray()
   @ArrayMaxSize(2, { message: '每条记录最多上传2张图片' })
   @IsString({ each: true, message: '图片链接必须是字符串' })
@@ -59,6 +64,11 @@ export class CreateRecordItemDto {
   @IsNotEmpty({ message: '记录内容不能为空' })
   @MaxLength(5000, { message: '内容不能超过5000个字符' })
   content: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000, { message: '备注不能超过1000个字符' })
+  remark?: string | null;
 
   @IsOptional()
   @IsArray()

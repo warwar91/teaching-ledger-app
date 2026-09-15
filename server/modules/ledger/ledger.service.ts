@@ -64,6 +64,7 @@ export class LedgerService {
       ledgerId: row.ledgerId,
       seqNo: row.seqNo,
       content: row.content,
+      remark: row.remark ?? null,
       imageUrls: row.imageUrls ?? [],
       expectedDate: row.expectedDate ?? null,
       mainExecutor: row.mainExecutor ?? null,
@@ -371,6 +372,7 @@ export class LedgerService {
         ledgerId,
         seqNo: currentMax + index + 1,
         content: r.content,
+        remark: r.remark ?? null,
         imageUrls: r.imageUrls ?? [],
         expectedDate: r.expectedDate ?? null,
         mainExecutor: r.mainExecutor ?? null,
@@ -409,6 +411,7 @@ export class LedgerService {
 
       const patch: Partial<typeof ledgerRecord.$inferInsert> = {};
       if (dto.content !== undefined) patch.content = dto.content;
+      if (dto.remark !== undefined) patch.remark = dto.remark;
       if (dto.imageUrls !== undefined) patch.imageUrls = dto.imageUrls;
       if (dto.expectedDate !== undefined) patch.expectedDate = dto.expectedDate;
       if (dto.mainExecutor !== undefined) patch.mainExecutor = dto.mainExecutor;
@@ -606,13 +609,14 @@ export class LedgerService {
         completed: '已完成',
       };
 
-      const headers = ['序号', '内容', '主要执行人', '预计完成时间', '进度状态', '图片链接', '录入时间'];
+      const headers = ['序号', '内容', '备注', '主要执行人', '预计完成时间', '进度状态', '图片链接', '录入时间'];
       const dataRows: string[][] = [];
 
       for (const rec of records) {
         dataRows.push([
           String(rec.seqNo),
           rec.content,
+          rec.remark ?? '',
           rec.mainExecutor ?? '',
           rec.expectedDate ?? '',
           statusMap[rec.progressStatus] ?? rec.progressStatus,

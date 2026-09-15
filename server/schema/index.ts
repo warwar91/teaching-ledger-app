@@ -92,6 +92,7 @@ export const ledgerRecord = pgTable('ledger_record', {
   ledgerId: uuid('ledger_id').notNull(),
   seqNo: integer('seq_no').notNull(),
   content: text('content').notNull(),
+  remark: text('remark'),
   imageUrls: text('image_urls').array().notNull().default([]),
   expectedDate: date('expected_date'),
   mainExecutor: varchar('main_executor', { length: 255 }),
