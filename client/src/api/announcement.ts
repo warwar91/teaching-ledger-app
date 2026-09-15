@@ -5,6 +5,14 @@ export interface AnnouncementListItem {
   title: string;
   publisher: string | null;
   publishDate: string;
+  announcementType: 'regular' | 'task';
+}
+
+export interface AnnouncementItem {
+  id: string;
+  content: string;
+  deadline: string | null;
+  sortOrder: number;
 }
 
 export interface AnnouncementDetail extends AnnouncementListItem {
@@ -14,6 +22,7 @@ export interface AnnouncementDetail extends AnnouncementListItem {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
+  items?: AnnouncementItem[];
 }
 
 export interface AnnouncementListResponse {
@@ -26,14 +35,22 @@ export interface AnnouncementListResponse {
 
 export interface AnnouncementCreateData {
   title: string;
-  content: string;
+  content?: string;
   publisher?: string;
   attachmentUrl?: string;
   attachmentName?: string;
+  announcementType?: 'regular' | 'task';
+  items?: Array<{ content: string; deadline?: string }>;
 }
 
 export interface AnnouncementUpdateData extends Partial<AnnouncementCreateData> {
   isPublished?: boolean;
+}
+
+export interface UserLedger {
+  id: string;
+  name: string;
+  ledgerType: string;
 }
 
 export const announcementApi = {
@@ -49,6 +66,16 @@ export const announcementApi = {
     http.patch<AnnouncementDetail>(`/announcements/${id}`, data),
   remove: (id: string) =>
     http.delete(`/announcements/${id}`),
+  getMyLedgers: () =>
+    http.get<UserLedger[]>('/announcements/my-ledgers'),
+  claimItems: (id: string, data: {
+    itemIds: string[];
+    targetLedgerId: string;
+    expectedDate?: string;
+    mainExecutor?: string;
+    remark?: string;
+  }) =>
+    http.post(`/announcements/${id}/claim`, data),
   uploadAttachment: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);

@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   Megaphone, Plus, Pencil, Trash2, X, Paperclip,
-  CalendarDays, User, Eye, EyeOff,
+  CalendarDays, User, Eye, EyeOff, ClipboardList,
 } from 'lucide-react';
 import {
   announcementApi,
   AnnouncementDetail,
+  AnnouncementItem,
 } from '@client/src/api/announcement';
 import { Spinner } from '@client/src/components/ui/spinner';
 import {
@@ -25,6 +26,7 @@ const AdminAnnouncementPage: React.FC = () => {
   const [editing, setEditing] = useState<AnnouncementDetail | null>(null);
 
   // Form state
+  const [announcementType, setAnnouncementType] = useState<'regular' | 'task'>('regular');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [publisher, setPublisher] = useState('');
@@ -32,6 +34,10 @@ const AdminAnnouncementPage: React.FC = () => {
   const [attachmentName, setAttachmentName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  // Task items
+  const [items, setItems] = useState<Array<{ content: string; deadline: string }>>([
+    { content: '', deadline: '' },
+  ]);
 
   const loadList = async () => {
     setLoading(true);
@@ -51,22 +57,47 @@ const AdminAnnouncementPage: React.FC = () => {
 
   const openCreate = () => {
     setEditing(null);
+    setAnnouncementType('regular');
     setTitle('');
     setContent('');
     setPublisher('');
     setAttachmentUrl('');
     setAttachmentName('');
+    setItems([{ content: '', deadline: '' }]);
     setEditOpen(true);
   };
 
   const openEdit = (item: AnnouncementDetail) => {
     setEditing(item);
+    setAnnouncementType(item.announcementType || 'regular');
     setTitle(item.title);
     setContent(item.content);
     setPublisher(item.publisher || '');
     setAttachmentUrl(item.attachmentUrl || '');
     setAttachmentName(item.attachmentName || '');
+    if (item.items && item.items.length > 0) {
+      setItems(item.items.map((it: AnnouncementItem) => ({
+        content: it.content,
+        deadline: it.deadline || '',
+      })));
+    } else {
+      setItems([{ content: '', deadline: '' }]);
+    }
     setEditOpen(true);
+  };
+
+  const addItem = () => {
+    setItems([...items, { content: '', deadline: '' }]);
+  };
+
+  const removeItem = (idx: number) => {
+    setItems(items.filter((_, i) => i !== idx));
+  };
+
+  const updateItem = (idx: number, field: 'content' | 'deadline', value: string) => {
+    const newItems = [...items];
+    newItems[idx][field] = value;
+    setItems(newItems);
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,29 +125,42 @@ const AdminAnnouncementPage: React.FC = () => {
       toast.error('请输入公告标题');
       return;
     }
-    if (!content.trim()) {
+    if (announcementType === 'regular' && !content.trim()) {
       toast.error('请输入公告内容');
       return;
     }
+    if (announcementType === 'task') {
+      const validItems = items.filter((it) => it.content.trim());
+      if (validItems.length === 0) {
+        toast.error('请至少填写一条台账条目内容');
+        return;
+      }
+    }
     setSaving(true);
     try {
+      const payload: any = {
+        title: title.trim(),
+        publisher: publisher.trim(),
+        attachmentUrl: attachmentUrl || undefined,
+        attachmentName: attachmentName || undefined,
+        announcementType,
+      };
+      if (announcementType === 'regular') {
+        payload.content = content.trim();
+      } else {
+        payload.items = items
+          .filter((it) => it.content.trim())
+          .map((it) => ({
+            content: it.content.trim(),
+            deadline: it.deadline || undefined,
+          }));
+      }
+
       if (editing) {
-        await announcementApi.update(editing.id, {
-          title: title.trim(),
-          content: content.trim(),
-          publisher: publisher.trim(),
-          attachmentUrl: attachmentUrl || undefined,
-          attachmentName: attachmentName || undefined,
-        });
+        await announcementApi.update(editing.id, payload);
         toast.success('公告已更新');
       } else {
-        await announcementApi.create({
-          title: title.trim(),
-          content: content.trim(),
-          publisher: publisher.trim(),
-          attachmentUrl: attachmentUrl || undefined,
-          attachmentName: attachmentName || undefined,
-        });
+        await announcementApi.create(payload);
         toast.success('公告已发布');
       }
       setEditOpen(false);
@@ -183,10 +227,21 @@ const AdminAnnouncementPage: React.FC = () => {
               <div key={item.id} className="p-4 sm:p-5 hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="text-sm sm:text-base font-medium text-gray-900 truncate">
                         {item.title}
                       </h3>
+                      {item.announcementType === 'task' ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600">
+                          <ClipboardList className="h-3 w-3" />
+                          台账公告
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                          <Megaphone className="h-3 w-3" />
+                          普通公告
+                        </span>
+                      )}
                       {!item.isPublished && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
                           <EyeOff className="h-3 w-3" />
@@ -248,6 +303,41 @@ const AdminAnnouncementPage: React.FC = () => {
             <DialogTitle>{editing ? '编辑公告' : '发布新公告'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Type selector */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">公告类型</label>
+              <div className="mt-2 flex gap-3">
+                <button
+                  onClick={() => setAnnouncementType('regular')}
+                  className={`flex-1 rounded-lg border px-4 py-3 text-left transition-colors ${
+                    announcementType === 'regular'
+                      ? 'border-blue-400 bg-blue-50/50'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Megaphone className={`h-4 w-4 ${announcementType === 'regular' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${announcementType === 'regular' ? 'text-blue-700' : 'text-gray-700'}`}>普通公告</span>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">通知类信息，仅发布标题和正文</p>
+                </button>
+                <button
+                  onClick={() => setAnnouncementType('task')}
+                  className={`flex-1 rounded-lg border px-4 py-3 text-left transition-colors ${
+                    announcementType === 'task'
+                      ? 'border-blue-400 bg-blue-50/50'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <ClipboardList className={`h-4 w-4 ${announcementType === 'task' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${announcementType === 'task' ? 'text-blue-700' : 'text-gray-700'}`}>台账公告</span>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">任务型，用户可将条目加入自己的台账</p>
+                </button>
+              </div>
+            </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700">公告标题</label>
               <Input
@@ -257,16 +347,63 @@ const AdminAnnouncementPage: React.FC = () => {
                 className="mt-1.5 border-gray-200"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">公告内容</label>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="请输入公告内容，支持换行"
-                rows={8}
-                className="mt-1.5 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-100 resize-y"
-              />
-            </div>
+
+            {/* Regular type: content textarea */}
+            {announcementType === 'regular' && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">公告内容</label>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="请输入公告内容，支持换行"
+                  rows={8}
+                  className="mt-1.5 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-100 resize-y"
+                />
+              </div>
+            )}
+
+            {/* Task type: dynamic items */}
+            {announcementType === 'task' && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">台账条目</label>
+                <p className="text-xs text-gray-500 mt-0.5">用户可逐条选择并添加到自己的周台账或学期台账</p>
+                <div className="mt-2 space-y-2">
+                  {items.map((item, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <div className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-2">
+                        <Input
+                          value={item.content}
+                          onChange={(e) => updateItem(idx, 'content', e.target.value)}
+                          placeholder={`第 ${idx + 1} 条工作内容`}
+                          className="border-0 px-0 shadow-none focus-visible:ring-0"
+                        />
+                      </div>
+                      <Input
+                        type="date"
+                        value={item.deadline}
+                        onChange={(e) => updateItem(idx, 'deadline', e.target.value)}
+                        className="w-36 border-gray-200 text-sm"
+                      />
+                      <button
+                        onClick={() => removeItem(idx)}
+                        className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 shrink-0"
+                        disabled={items.length <= 1}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={addItem}
+                    className="w-full rounded-lg border border-dashed border-gray-300 py-2.5 text-sm text-gray-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/30 transition-colors flex items-center justify-center gap-1"
+                  >
+                    <Plus className="h-4 w-4" />
+                    添加一条
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="text-sm font-medium text-gray-700">落款（发布人）</label>
               <Input

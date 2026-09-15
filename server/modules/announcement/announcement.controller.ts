@@ -37,6 +37,13 @@ export class AnnouncementController {
     return this.announcementService.adminFindAll();
   }
 
+  // 普通用户：获取自己的台账文件夹列表（用于添加到台账功能）
+  @Get('my-ledgers')
+  @UseGuards(JwtAuthGuard)
+  getUserLedgers(@Req() req: any) {
+    return this.announcementService.getUserLedgers(req.user.userId);
+  }
+
   // 普通用户：查看公告详情
   @Get(':id')
   @UseGuards(JwtAuthGuard)
@@ -50,17 +57,47 @@ export class AnnouncementController {
   create(
     @Body() body: {
       title: string;
-      content: string;
+      content?: string;
       publisher?: string;
       attachmentUrl?: string;
       attachmentName?: string;
+      announcementType?: string;
+      items?: Array<{ content: string; deadline?: string }>;
     },
     @Req() req: any,
   ) {
     return this.announcementService.create({
       ...body,
+      content: body.content || '',
       createdBy: req.user?.userId,
     });
+  }
+
+  // 普通用户：将台账公告中的条目添加到自己的台账
+  @Post(':id/claim')
+  @UseGuards(JwtAuthGuard)
+  claim(
+    @Param('id') id: string,
+    @Body() body: {
+      itemIds: string[];
+      targetLedgerId: string;
+      expectedDate?: string;
+      mainExecutor?: string;
+      remark?: string;
+    },
+    @Req() req: any,
+  ) {
+    return this.announcementService.claimItems(
+      req.user.userId,
+      id,
+      body.itemIds,
+      body.targetLedgerId,
+      {
+        expectedDate: body.expectedDate,
+        mainExecutor: body.mainExecutor,
+        remark: body.remark,
+      }
+    );
   }
 
   // 管理员：编辑公告
@@ -75,6 +112,7 @@ export class AnnouncementController {
       attachmentUrl?: string;
       attachmentName?: string;
       isPublished?: boolean;
+      items?: Array<{ id?: string; content: string; deadline?: string }>;
     },
     @Req() req: any,
   ) {

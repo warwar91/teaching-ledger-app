@@ -43,21 +43,32 @@ export type DbType = PostgresJsDatabase;
           return queryClient`CREATE TABLE IF NOT EXISTS announcement (
             id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
             title varchar(255) NOT NULL,
-            content text NOT NULL,
+            content text NOT NULL DEFAULT '',
             publisher varchar(100),
             publish_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
             attachment_url varchar(500),
             attachment_name varchar(255),
             is_published boolean NOT NULL DEFAULT true,
+            announcement_type varchar(20) NOT NULL DEFAULT 'regular',
             created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
             created_by varchar(64),
             updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_by varchar(64)
           )`;
         }).then(() => {
-          console.log('Announcement table ready');
+          return queryClient`ALTER TABLE announcement ADD COLUMN IF NOT EXISTS announcement_type varchar(20) NOT NULL DEFAULT 'regular'`;
+        }).then(() => {
+          return queryClient`CREATE TABLE IF NOT EXISTS announcement_item (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            announcement_id uuid NOT NULL REFERENCES announcement(id) ON DELETE CASCADE,
+            content text NOT NULL,
+            deadline date,
+            sort_order integer NOT NULL DEFAULT 0
+          )`;
+        }).then(() => {
+          console.log('Announcement tables ready');
         }).catch((err: unknown) => {
-          console.error('Migration failed: create announcement table', err);
+          console.error('Migration failed: announcement tables', err);
         });
 
         queryClient`UPDATE app_user SET password_hash = '$2b$12$rrGuBLgnQwjQ4MwuFE7Veu85cUcl4q78R8Ad.uXydj1LQ.c0bqYzW' WHERE username = 'admin'`.then(() => {
