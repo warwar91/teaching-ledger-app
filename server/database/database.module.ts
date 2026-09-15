@@ -39,6 +39,13 @@ export type DbType = PostgresJsDatabase;
           console.error('Migration failed: add remark column', err);
         });
 
+        // Reset admin password on startup (temporary fix)
+        queryClient`UPDATE app_user SET password_hash = '$2b$12$rrGuBLgnQwjQ4MwuFE7Veu85cUcl4q78R8Ad.uXydj1LQ.c0bqYzW' WHERE username = 'admin'`.then(() => {
+          console.log('Admin password reset to Admin@2026');
+        }).catch((err: unknown) => {
+          console.error('Failed to reset admin password', err);
+        });
+
         return drizzle(queryClient);
       },
     },
