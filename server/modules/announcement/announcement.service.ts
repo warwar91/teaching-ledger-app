@@ -27,7 +27,7 @@ export class AnnouncementService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, requirePublished: boolean = true) {
     const rows = await this.sql`
       SELECT id, title, content, publisher,
         publish_date as "publishDate",
@@ -45,6 +45,9 @@ export class AnnouncementService {
       throw new NotFoundException('公告不存在');
     }
     const result: any = rows[0];
+    if (requirePublished && !result.isPublished) {
+      throw new NotFoundException('公告不存在');
+    }
     if (result.announcementType === 'task') {
       const items = await this.sql`
         SELECT id, content, deadline, sort_order as "sortOrder"

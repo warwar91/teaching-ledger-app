@@ -47,8 +47,9 @@ export class AnnouncementController {
   // 普通用户：查看公告详情
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.announcementService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    const requirePublished = req.user?.role !== 'admin';
+    return this.announcementService.findOne(id, requirePublished);
   }
 
   // 管理员：创建公告

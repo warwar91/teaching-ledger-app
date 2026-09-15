@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Megaphone, ChevronLeft, ChevronRight, CalendarDays, User, ClipboardList } from 'lucide-react';
+import { Megaphone, ChevronLeft, ChevronRight, CalendarDays, User, ClipboardList, Settings } from 'lucide-react';
 import { announcementApi, AnnouncementListItem } from '@client/src/api/announcement';
 import { Spinner } from '@client/src/components/ui/spinner';
 import { useAuth } from '@client/src/contexts/AuthContext';
+import { Button } from '@client/src/components/ui/button';
 
 const AnnouncementListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,16 +39,29 @@ const AnnouncementListPage: React.FC = () => {
     <div className="mx-auto max-w-4xl p-4 sm:p-8">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-            <Megaphone className="h-5 w-5 text-blue-600" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+              <Megaphone className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">公告通知</h1>
+              <p className="mt-0.5 text-sm text-gray-500">
+                共 {total} 条公告，按发布时间倒序排列
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">公告通知</h1>
-            <p className="mt-0.5 text-sm text-gray-500">
-              共 {total} 条公告，按发布时间倒序排列
-            </p>
-          </div>
+          {user?.role === 'admin' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin/announcements')}
+              className="gap-1.5 border-gray-200 hover:bg-gray-50 text-xs sm:text-sm shrink-0"
+            >
+              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              公告管理
+            </Button>
+          )}
         </div>
       </div>
 
