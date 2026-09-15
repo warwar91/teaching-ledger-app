@@ -40,20 +40,22 @@ export type DbType = PostgresJsDatabase;
         });
 
         // Create announcement table if not exists
-        queryClient`CREATE TABLE IF NOT EXISTS announcement (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          title varchar(255) NOT NULL,
-          content text NOT NULL,
-          publisher varchar(100),
-          publish_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          attachment_url varchar(500),
-          attachment_name varchar(255),
-          is_published boolean NOT NULL DEFAULT true,
-          created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          created_by varchar(64),
-          updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          updated_by varchar(64)
-        )`.then(() => {
+        queryClient`CREATE EXTENSION IF NOT EXISTS pgcrypto`.then(() => {
+          return queryClient`CREATE TABLE IF NOT EXISTS announcement (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            title varchar(255) NOT NULL,
+            content text NOT NULL,
+            publisher varchar(100),
+            publish_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            attachment_url varchar(500),
+            attachment_name varchar(255),
+            is_published boolean NOT NULL DEFAULT true,
+            created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            created_by varchar(64),
+            updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_by varchar(64)
+          )`;
+        }).then(() => {
           console.log('Announcement table ready');
         }).catch((err: unknown) => {
           console.error('Migration failed: create announcement table', err);
