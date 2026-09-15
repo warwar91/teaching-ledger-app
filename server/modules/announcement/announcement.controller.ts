@@ -30,6 +30,13 @@ export class AnnouncementController {
     return this.announcementService.findAll(p, ps);
   }
 
+  // 管理员：查看所有公告（含未发布）—— 必须在 :id 路由之前注册
+  @Get('admin/all')
+  @UseGuards(AdminGuard)
+  adminFindAll() {
+    return this.announcementService.adminFindAll();
+  }
+
   // 普通用户：查看公告详情
   @Get(':id')
   @UseGuards(JwtAuthGuard)
@@ -82,12 +89,5 @@ export class AnnouncementController {
   @UseGuards(AdminGuard)
   remove(@Param('id') id: string) {
     return this.announcementService.remove(id);
-  }
-
-  // 管理员：查看所有公告（含未发布）
-  @Get('admin/all')
-  @UseGuards(AdminGuard)
-  adminFindAll() {
-    return this.announcementService.adminFindAll();
   }
 }
