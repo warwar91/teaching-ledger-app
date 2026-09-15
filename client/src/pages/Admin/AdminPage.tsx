@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import {
   Eye,
   KeyRound,
-  Megaphone,
   Settings,
   Shield,
   Trash2,
@@ -216,18 +215,10 @@ const AdminPage: React.FC = () => {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">管理后台</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              管理所有用户、台账及公告数据
+              管理所有用户及台账数据
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => navigate('/admin/announcements')}
-          className="gap-2 border-gray-200 hover:bg-gray-50"
-        >
-          <Megaphone className="h-4 w-4" />
-          公告管理
-        </Button>
       </div>
 
       <Tabs defaultValue="users" className="w-full">

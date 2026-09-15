@@ -266,4 +266,54 @@ export class AuthService {
       throw new UnauthorizedException('会话不存在');
     }
   }
+
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const userResults = await this.db
+      .select({
+        userId: appUser.userId,
+        passwordHash: appUser.passwordHash,
+      })
+      .from(appUser)
+      .where(eq(appUser.userId, userId))
+      .limit(1);
+
+    if (userResults.length === 0) {
+      throw new UnauthorizedException('用户不存在');
+    }
+
+    const user = userResults[0];
+
+    if (!this.verifyPassword(oldPassword, user.passwordHash)) {
+      throw new UnauthorizedException('原密码不正确');
+    }
+
+    if (oldPassword === newPassword) {
+      throw new ConflictException('新密码不能与原密码相同');
+    }
+
+    const newHash = this.hashPassword(newPassword);
+
+    await this.db
+      .update(appUser)
+      .set({ passwordHash: newHash })
+      .where(eq(appUser.userId, userId));
+
+    // 密码修改后使所有会话失效，强制重新登录
+    await this.db
+      .update(appSession)
+      .set({ status: 'invalid' })
+      .where(
+        and(
+          eq(appSession.userId, userId),
+          eq(appSession.status, 'active'),
+        ),
+      );
+
+    this.logger.log(`用户 ${userId} 修改密码成功，已失效所有会话`);
+    return { message: '密码修改成功，请重新登录' };
+  }
 }

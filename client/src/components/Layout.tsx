@@ -8,6 +8,7 @@ import {
   CalendarDays,
   GraduationCap,
   HelpCircle,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -16,6 +17,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { logger } from '@client/src/utils/logger';
 import logoUrl from '@client/src/assets/logo.png';
 
@@ -27,12 +29,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@client/src/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@client/src/components/ui/dialog';
+import { Input } from '@client/src/components/ui/input';
 import { useAuth } from '@client/src/contexts/AuthContext';
+import * as authApi from '@client/src/api/auth';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pwdDialogOpen, setPwdDialogOpen] = useState(false);
+  const [oldPwd, setOldPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [pwdSubmitting, setPwdSubmitting] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -52,6 +69,48 @@ const Layout: React.FC = () => {
   // 点击导航后关闭移动端侧边栏
   const handleNavClick = () => {
     setSidebarOpen(false);
+  };
+
+  const resetPwdForm = () => {
+    setOldPwd('');
+    setNewPwd('');
+    setConfirmPwd('');
+  };
+
+  const handleChangePassword = async () => {
+    if (!oldPwd || !newPwd || !confirmPwd) {
+      toast.error('请填写完整所有字段');
+      return;
+    }
+    if (newPwd.length < 8 || newPwd.length > 128) {
+      toast.error('新密码长度需为 8~128 位');
+      return;
+    }
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPwd)) {
+      toast.error('新密码必须同时包含大小写字母和数字');
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      toast.error('两次输入的新密码不一致');
+      return;
+    }
+    if (oldPwd === newPwd) {
+      toast.error('新密码不能与原密码相同');
+      return;
+    }
+    setPwdSubmitting(true);
+    try {
+      await authApi.changePassword(oldPwd, newPwd);
+      toast.success('密码修改成功，请重新登录');
+      setPwdDialogOpen(false);
+      resetPwdForm();
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || '密码修改失败');
+    } finally {
+      setPwdSubmitting(false);
+    }
   };
 
   if (loading || !isAuthenticated || !user) {
@@ -212,6 +271,16 @@ const Layout: React.FC = () => {
                   使用说明
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  onClick={() => {
+                    resetPwdForm();
+                    setPwdDialogOpen(true);
+                  }}
+                  className="cursor-pointer rounded-lg py-2 px-3 text-sm"
+                >
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  修改密码
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={handleLogout}
                   className="cursor-pointer rounded-lg py-2 px-3 text-sm text-red-600 focus:text-red-600 focus:bg-red-50"
                 >
@@ -228,6 +297,73 @@ const Layout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* 修改密码弹窗 */}
+      <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-blue-600" />
+              修改密码
+            </DialogTitle>
+            <DialogDescription>
+              请输入原密码和新密码，修改成功后需重新登录
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">原密码</label>
+              <Input
+                type="password"
+                value={oldPwd}
+                onChange={(e) => setOldPwd(e.target.value)}
+                placeholder="请输入当前密码"
+                className="mt-1.5 border-gray-200"
+                autoComplete="current-password"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">新密码</label>
+              <Input
+                type="password"
+                value={newPwd}
+                onChange={(e) => setNewPwd(e.target.value)}
+                placeholder="8~128位，含大小写字母和数字"
+                className="mt-1.5 border-gray-200"
+                autoComplete="new-password"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">确认新密码</label>
+              <Input
+                type="password"
+                value={confirmPwd}
+                onChange={(e) => setConfirmPwd(e.target.value)}
+                placeholder="再次输入新密码"
+                className="mt-1.5 border-gray-200"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPwdDialogOpen(false)}
+              className="border-gray-200"
+              disabled={pwdSubmitting}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={handleChangePassword}
+              disabled={pwdSubmitting}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {pwdSubmitting ? '提交中...' : '确认修改'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

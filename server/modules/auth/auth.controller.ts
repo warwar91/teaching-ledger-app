@@ -51,4 +51,18 @@ export class AuthController {
     await this.authService.heartbeat(sessionId);
     return { message: 'ok' };
   }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @CurrentUser('userId') userId: string,
+    @Body() body: { oldPassword: string; newPassword: string },
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(
+      userId,
+      body.oldPassword,
+      body.newPassword,
+    );
+  }
 }

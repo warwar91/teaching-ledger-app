@@ -54,3 +54,19 @@ export async function heartbeat(): Promise<void> {
     throw err;
   }
 }
+
+export async function changePassword(
+  oldPassword: string,
+  newPassword: string,
+): Promise<{ message: string }> {
+  try {
+    const res = await http.post<{ message: string }>('/auth/change-password', {
+      oldPassword,
+      newPassword,
+    });
+    return res.data;
+  } catch (err: unknown) {
+    logger.error(`auth.changePassword failed: ${JSON.stringify(err)}`);
+    throw err;
+  }
+}
