@@ -186,7 +186,7 @@ const HomePage: React.FC = () => {
             <DialogTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5 text-destructive" />
               待办提醒
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
+              <span className="ml-2 text-sm font-normal text-gray-500">
                 共 {reminders.length} 条
               </span>
             </DialogTitle>
@@ -209,11 +209,11 @@ const HomePage: React.FC = () => {
                     <div className="font-medium text-sm truncate">
                       {item.content}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       所属台账：{item.ledgerName}
                     </div>
                     {item.expectedDate && (
-                      <div className="text-xs text-muted-foreground mt-0.5">
+                      <div className="text-xs text-gray-500 mt-0.5">
                         预计完成：{item.expectedDate}
                         {item.daysLeft < 0
                           ? `（已逾期 ${Math.abs(item.daysLeft)} 天）`

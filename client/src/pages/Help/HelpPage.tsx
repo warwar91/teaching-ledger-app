@@ -219,8 +219,8 @@ const HelpPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">使用说明</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold text-gray-900">使用说明</h1>
+        <p className="mt-1 text-sm text-gray-500">
           教学工作台账管理系统 — 常见问题与操作指南
         </p>
       </div>
@@ -231,10 +231,10 @@ const HelpPage: React.FC = () => {
             <button
               key={section.id}
               onClick={() => setActiveSection(section.id)}
-              className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                 activeSection === section.id
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
               <section.icon className="h-4 w-4" />
@@ -245,27 +245,28 @@ const HelpPage: React.FC = () => {
 
         <div className="flex-1">
           {currentSection && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <currentSection.icon className="h-5 w-5 text-primary" />
+            <Card className="border-gray-200 shadow-sm rounded-xl">
+              <CardHeader className="border-b border-gray-100">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <currentSection.icon className="h-5 w-5 text-blue-600" />
                   {currentSection.title}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-500">
                   共 {currentSection.items.length} 个常见问题
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-4">
                 <Accordion type="single" collapsible className="w-full">
                   {currentSection.items.map((item, index) => (
                     <AccordionItem
                       key={index}
                       value={`item-${index}`}
+                      className="border-b border-gray-100"
                     >
-                      <AccordionTrigger className="text-left text-sm font-medium">
+                      <AccordionTrigger className="text-left text-sm font-medium text-gray-800 hover:text-gray-900 hover:no-underline">
                         {item.q}
                       </AccordionTrigger>
-                      <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                      <AccordionContent className="text-sm text-gray-600 leading-relaxed">
                         {item.a}
                       </AccordionContent>
                     </AccordionItem>

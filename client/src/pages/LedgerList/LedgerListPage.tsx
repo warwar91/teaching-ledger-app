@@ -228,7 +228,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
       ) : (
         <>
           {/* Select all */}
-          <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
             <Checkbox
               checked={allSelected}
               onCheckedChange={(checked) =>

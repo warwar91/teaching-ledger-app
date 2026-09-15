@@ -440,9 +440,9 @@ const LedgerDetailPage: React.FC = () => {
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-12 text-center text-gray-600">序号</TableHead>
                     <TableHead className="text-gray-600">内容</TableHead>
-                    <TableHead className="w-40 text-gray-600">备注</TableHead>
                     <TableHead className="w-28 text-gray-600">预计完成</TableHead>
                     <TableHead className="w-24 text-gray-600">执行人</TableHead>
+                    <TableHead className="w-40 text-gray-600">备注</TableHead>
                     <TableHead className="w-28 text-gray-600">状态</TableHead>
                     <TableHead className="w-24 text-right text-gray-600">操作</TableHead>
                   </TableRow>
@@ -452,11 +452,11 @@ const LedgerDetailPage: React.FC = () => {
                     const style = getStatusStyle(record);
                     return (
                     <TableRow key={record.id} className="border-b border-gray-100 hover:bg-gray-50/50">
-                      <TableCell className="text-center text-muted-foreground">
+                      <TableCell className="text-center text-gray-500">
                         {record.seqNo}
                       </TableCell>
-                      <TableCell className="max-w-xs">
-                        <div className="truncate" title={record.content}>
+                      <TableCell className="max-w-md">
+                        <div className="text-sm leading-relaxed break-all" style={{maxWidth: '25em'}}>
                           {record.content}
                         </div>
                         {record.imageUrls && record.imageUrls.length > 0 && (
@@ -467,7 +467,7 @@ const LedgerDetailPage: React.FC = () => {
                                 href={url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-xs text-primary hover:underline"
+                                className="text-xs text-blue-600 hover:underline"
                               >
                                 图片{idx + 1}
                               </a>
@@ -475,17 +475,17 @@ const LedgerDetailPage: React.FC = () => {
                           </div>
                         )}
                       </TableCell>
+                      <TableCell className="text-sm">{record.expectedDate || '-'}</TableCell>
+                      <TableCell className="text-sm">{record.mainExecutor || '-'}</TableCell>
                       <TableCell className="max-w-[160px]">
                         {record.remark ? (
-                          <div className="truncate text-xs text-muted-foreground" title={record.remark}>
+                          <div className="text-xs text-gray-500 break-words" style={{maxWidth: '10em'}}>
                             {record.remark}
                           </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground/50">-</span>
+                          <span className="text-xs text-gray-300">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm">{record.expectedDate || '-'}</TableCell>
-                      <TableCell className="text-sm">{record.mainExecutor || '-'}</TableCell>
                       <TableCell>
                         <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${style.badgeClass}`}>
                           {style.label}
@@ -498,7 +498,7 @@ const LedgerDetailPage: React.FC = () => {
                               操作
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-lg border-gray-200 shadow-lg">
+                          <DropdownMenuContent align="end" className="rounded-lg border-gray-200 bg-white shadow-lg">
                             <DropdownMenuItem
                               onClick={() =>
                                 handleUpdateStatus(record.id, 'pending')

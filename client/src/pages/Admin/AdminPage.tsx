@@ -236,18 +236,18 @@ const AdminPage: React.FC = () => {
             <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold">用户名</TableHead>
-                    <TableHead className="w-24">角色</TableHead>
-                    <TableHead className="w-40">注册时间</TableHead>
-                    <TableHead className="w-28 text-center">周台账数</TableHead>
-                    <TableHead className="w-28 text-center">学期台账数</TableHead>
-                      <TableHead className="w-60 text-right">操作</TableHead>
+                  <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="font-semibold text-gray-600">用户名</TableHead>
+                    <TableHead className="w-24 text-gray-600">角色</TableHead>
+                    <TableHead className="w-40 text-gray-600">注册时间</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">周台账数</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">学期台账数</TableHead>
+                      <TableHead className="w-60 text-right text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users.map((u) => (
-                    <TableRow key={u.userId} className="hover:bg-gray-50/50">
+                    <TableRow key={u.userId} className="border-b border-gray-100 hover:bg-gray-50/50">
                       <TableCell className="font-medium text-gray-900">{u.username}</TableCell>
                       <TableCell>
                         {u.role === 'admin' ? (
@@ -350,17 +350,17 @@ const AdminPage: React.FC = () => {
             <div className="max-h-96 overflow-y-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>台账名称</TableHead>
-                    <TableHead className="w-20">类型</TableHead>
-                    <TableHead className="w-20 text-center">记录数</TableHead>
-                    <TableHead className="w-28">创建时间</TableHead>
-                    <TableHead className="w-20 text-right">操作</TableHead>
+                  <TableRow className="border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="text-gray-600">台账名称</TableHead>
+                    <TableHead className="w-20 text-gray-600">类型</TableHead>
+                    <TableHead className="w-20 text-center text-gray-600">记录数</TableHead>
+                    <TableHead className="w-28 text-gray-600">创建时间</TableHead>
+                    <TableHead className="w-20 text-right text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {userLedgers.map((ledger) => (
-                    <TableRow key={ledger.id}>
+                    <TableRow key={ledger.id} className="border-b border-gray-100 hover:bg-gray-50/50">
                       <TableCell className="font-medium">
                         {ledger.name}
                       </TableCell>
@@ -438,18 +438,18 @@ const AdminPage: React.FC = () => {
             <div className="max-h-[60vh] overflow-y-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12 text-center">#</TableHead>
-                    <TableHead>内容</TableHead>
-                    <TableHead className="w-28">预计完成时间</TableHead>
-                    <TableHead className="w-24">执行人</TableHead>
-                    <TableHead className="w-20">状态</TableHead>
+                  <TableRow className="border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="w-12 text-center text-gray-600">#</TableHead>
+                    <TableHead className="text-gray-600">内容</TableHead>
+                    <TableHead className="w-28 text-gray-600">预计完成时间</TableHead>
+                    <TableHead className="w-24 text-gray-600">执行人</TableHead>
+                    <TableHead className="w-20 text-gray-600">状态</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {viewLedgerDetail?.records.map(
                     (record: LedgerRecordItem) => (
-                      <TableRow key={record.id}>
+                      <TableRow key={record.id} className="border-b border-gray-100 hover:bg-gray-50/50">
                         <TableCell className="text-center text-muted-foreground">
                           {record.seqNo}
                         </TableCell>

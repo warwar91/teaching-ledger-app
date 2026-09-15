@@ -230,11 +230,11 @@ const RecycleBinPage: React.FC = () => {
           </EmptyContent>
         </Empty>
       ) : (
-        <div className="rounded-lg border border-border bg-card shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
+              <TableRow className="border-b border-gray-200 hover:bg-transparent">
+                <TableHead className="w-12 text-gray-600">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={(checked) =>
@@ -243,16 +243,16 @@ const RecycleBinPage: React.FC = () => {
                     aria-label="全选"
                   />
                 </TableHead>
-                <TableHead>台账名称</TableHead>
-                <TableHead className="w-24">类型</TableHead>
-                <TableHead className="w-32">记录数</TableHead>
-                <TableHead className="w-40">删除时间</TableHead>
-                <TableHead className="w-44 text-right">操作</TableHead>
+                <TableHead className="text-gray-600">台账名称</TableHead>
+                <TableHead className="w-24 text-gray-600">类型</TableHead>
+                <TableHead className="w-32 text-gray-600">记录数</TableHead>
+                <TableHead className="w-40 text-gray-600">删除时间</TableHead>
+                <TableHead className="w-44 text-right text-gray-600">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className="border-b border-gray-100 hover:bg-gray-50/50">
                   <TableCell>
                     <Checkbox
                       checked={selectedIds.has(item.id)}
