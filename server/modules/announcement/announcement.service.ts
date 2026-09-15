@@ -1,8 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DRIZZLE_DATABASE } from '@server/database/database.module';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { eq, desc } from 'drizzle-orm';
-import { announcement } from '@server/schema';
+import { sql } from 'drizzle-orm';
 
 @Injectable()
 export class AnnouncementService {
@@ -10,25 +9,19 @@ export class AnnouncementService {
 
   async findAll(page: number = 1, pageSize: number = 12) {
     const offset = (page - 1) * pageSize;
-    const rows = await this.db
-      .select({
-        id: announcement.id,
-        title: announcement.title,
-        publisher: announcement.publisher,
-        publishDate: announcement.publishDate,
-      })
-      .from(announcement)
-      .where(eq(announcement.isPublished, true))
-      .orderBy(desc(announcement.publishDate))
-      .limit(pageSize)
-      .offset(offset);
+    const rows = await this.db.execute(sql`
+      SELECT id, title, publisher, publish_date
+      FROM announcement
+      WHERE is_published = true
+      ORDER BY publish_date DESC
+      LIMIT ${pageSize} OFFSET ${offset}
+    `);
 
-    const countResult = await this.db
-      .select({ count: announcement.id })
-      .from(announcement)
-      .where(eq(announcement.isPublished, true));
+    const countResult = await this.db.execute(sql`
+      SELECT COUNT(*) as total FROM announcement WHERE is_published = true
+    `);
 
-    const total = countResult.length;
+    const total = Number((countResult[0] as any)?.total || 0);
     return {
       list: rows,
       total,
@@ -39,12 +32,10 @@ export class AnnouncementService {
   }
 
   async findOne(id: string) {
-    const rows = await this.db
-      .select()
-      .from(announcement)
-      .where(eq(announcement.id, id))
-      .limit(1);
-    if (rows.length === 0) {
+    const rows = await this.db.execute(sql`
+      SELECT * FROM announcement WHERE id = ${id}::uuid LIMIT 1
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return rows[0];
@@ -58,17 +49,18 @@ export class AnnouncementService {
     attachmentName?: string;
     createdBy?: string;
   }) {
-    const rows = await this.db
-      .insert(announcement)
-      .values({
-        title: data.title,
-        content: data.content,
-        publisher: data.publisher,
-        attachmentUrl: data.attachmentUrl,
-        attachmentName: data.attachmentName,
-        createdBy: data.createdBy,
-      })
-      .returning();
+    const rows = await this.db.execute(sql`
+      INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by)
+      VALUES (
+        ${data.title},
+        ${data.content},
+        ${data.publisher || null},
+        ${data.attachmentUrl || null},
+        ${data.attachmentName || null},
+        ${data.createdBy || null}
+      )
+      RETURNING *
+    `);
     return rows[0];
   }
 
@@ -81,35 +73,38 @@ export class AnnouncementService {
     isPublished?: boolean;
     updatedBy?: string;
   }) {
-    const rows = await this.db
-      .update(announcement)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
-      .where(eq(announcement.id, id))
-      .returning();
-    if (rows.length === 0) {
+    const rows = await this.db.execute(sql`
+      UPDATE announcement SET
+        title = COALESCE(${data.title || null}, title),
+        content = COALESCE(${data.content || null}, content),
+        publisher = COALESCE(${data.publisher || null}, publisher),
+        attachment_url = COALESCE(${data.attachmentUrl || null}, attachment_url),
+        attachment_name = COALESCE(${data.attachmentName || null}, attachment_name),
+        is_published = COALESCE(${data.isPublished === undefined ? null : data.isPublished}, is_published),
+        updated_by = COALESCE(${data.updatedBy || null}, updated_by),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ${id}::uuid
+      RETURNING *
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return rows[0];
   }
 
   async remove(id: string) {
-    const rows = await this.db
-      .delete(announcement)
-      .where(eq(announcement.id, id))
-      .returning({ id: announcement.id });
-    if (rows.length === 0) {
+    const rows = await this.db.execute(sql`
+      DELETE FROM announcement WHERE id = ${id}::uuid RETURNING id
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return { success: true };
   }
 
   async adminFindAll() {
-    return this.db
-      .select()
-      .from(announcement)
-      .orderBy(desc(announcement.publishDate));
+    return this.db.execute(sql`
+      SELECT * FROM announcement ORDER BY publish_date DESC
+    `);
   }
 }
