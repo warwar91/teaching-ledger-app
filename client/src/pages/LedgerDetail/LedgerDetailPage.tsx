@@ -687,7 +687,7 @@ const LedgerDetailPage: React.FC = () => {
                   <Plus className="h-4 w-4" />
                   增加一行
                 </Button>
-                <Button onClick={handleSubmitRecords} disabled={submitting} className="bg-blue-600 hover:bg-blue-700 shadow-sm">
+                <Button onClick={handleSubmitRecords} disabled={submitting} className="border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm">
                   {submitting && <Spinner className="h-4 w-4" />}
                   提交记录
                 </Button>

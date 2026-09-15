@@ -196,7 +196,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
           <Button 
             size="sm" 
             onClick={() => setCreateOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 shadow-sm"
+            className="gap-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm"
           >
             <Plus className="h-4 w-4" />
             新建台账
@@ -219,7 +219,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
             <EmptyDescription>
               点击右上角"新建台账"创建您的第一个{title}
             </EmptyDescription>
-            <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700">
               <Plus className="h-4 w-4" />
               新建台账
             </Button>

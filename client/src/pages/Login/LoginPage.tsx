@@ -103,31 +103,31 @@ const LoginPage: React.FC = () => {
       {/* 渐变叠加，增强可读性 */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/40 via-white/50 to-blue-100/40" />
 
-      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-white/90 backdrop-blur-sm">
+      <Card className="w-full max-w-md shadow-xl relative z-10 bg-white border-gray-200 rounded-2xl">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="mx-auto flex items-center justify-center">
             <img
               src={logoUrl}
               alt="河南开封科技传媒学院 经济学院"
-              style={{ width: '112px', height: '112px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+              style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
             />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-gray-500">
               河南开封科技传媒学院 经济学院
             </p>
-            <CardTitle className="text-xl font-semibold text-foreground">
+            <CardTitle className="text-xl font-semibold text-gray-900">
               教学工作台账管理系统
             </CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-gray-500">
             登录账户以管理您的教学工作台账
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="login-username">用户名</Label>
+              <Label htmlFor="login-username" className="text-gray-700">用户名</Label>
               <Input
                 id="login-username"
                 type="text"
@@ -136,10 +136,11 @@ const LoginPage: React.FC = () => {
                 onChange={(e) => setLoginUsername(e.target.value)}
                 autoComplete="username"
                 disabled={loginSubmitting}
+                className="h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="login-password">密码</Label>
+              <Label htmlFor="login-password" className="text-gray-700">密码</Label>
               <div className="relative">
                 <Input
                   id="login-password"
@@ -149,11 +150,11 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => setLoginPassword(e.target.value)}
                   autoComplete="current-password"
                   disabled={loginSubmitting}
-                  className="pr-10"
+                  className="pr-10 h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() =>
                     setLoginPasswordVisible((v) => !v)
                   }
@@ -172,7 +173,7 @@ const LoginPage: React.FC = () => {
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-sm"
               disabled={loginSubmitting}
             >
               {loginSubmitting && (
@@ -181,9 +182,9 @@ const LoginPage: React.FC = () => {
               {loginSubmitting ? '登录中...' : '登录'}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-muted-foreground">
+          <div className="mt-6 text-center text-sm text-gray-500">
             还没有账号？{' '}
-            <Link to="/register" className="text-primary hover:underline">
+            <Link to="/register" className="text-blue-600 hover:underline">
               立即注册
             </Link>
           </div>

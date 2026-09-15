@@ -114,31 +114,31 @@ const RegisterPage: React.FC = () => {
       {/* 渐变叠加，增强可读性 */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/40 via-white/50 to-blue-100/40" />
 
-      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-white/90 backdrop-blur-sm">
+      <Card className="w-full max-w-md shadow-xl relative z-10 bg-white border-gray-200 rounded-2xl">
         <CardHeader className="text-center space-y-3 pb-8">
           <div className="mx-auto flex items-center justify-center">
             <img
               src={logoUrl}
               alt="河南开封科技传媒学院 经济学院"
-              style={{ width: '112px', height: '112px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+              style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
             />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-gray-500">
               河南开封科技传媒学院 经济学院
             </p>
-            <CardTitle className="text-xl font-semibold text-foreground">
+            <CardTitle className="text-xl font-semibold text-gray-900">
               教学工作台账管理系统
             </CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-gray-500">
             注册新账户以管理您的教学工作台账
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="reg-username">用户名</Label>
+              <Label htmlFor="reg-username" className="text-gray-700">用户名</Label>
               <Input
                 id="reg-username"
                 type="text"
@@ -147,24 +147,25 @@ const RegisterPage: React.FC = () => {
                 onChange={(e) => setRegUsername(e.target.value)}
                 autoComplete="username"
                 disabled={regSubmitting}
+                className="h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reg-password">密码</Label>
+              <Label htmlFor="reg-password" className="text-gray-700">密码</Label>
               <div className="relative">
                 <Input
                   id="reg-password"
                   type={regPasswordVisible ? 'text' : 'password'}
-                  placeholder="请输入密码（至少6位）"
+                  placeholder="请输入密码（至少8位，含大小写字母+数字）"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   autoComplete="new-password"
                   disabled={regSubmitting}
-                  className="pr-10"
+                  className="pr-10 h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() =>
                     setRegPasswordVisible((v) => !v)
                   }
@@ -182,7 +183,7 @@ const RegisterPage: React.FC = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reg-confirm-password">确认密码</Label>
+              <Label htmlFor="reg-confirm-password" className="text-gray-700">确认密码</Label>
               <Input
                 id="reg-confirm-password"
                 type="password"
@@ -191,11 +192,12 @@ const RegisterPage: React.FC = () => {
                 onChange={(e) => setRegConfirmPassword(e.target.value)}
                 autoComplete="new-password"
                 disabled={regSubmitting}
+                className="h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
               />
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white border-0 shadow-sm"
               disabled={regSubmitting}
             >
               {regSubmitting && (
@@ -204,7 +206,7 @@ const RegisterPage: React.FC = () => {
               {regSubmitting ? '注册中...' : '注册'}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-muted-foreground">
+          <div className="mt-6 text-center text-sm text-gray-500">
             已有账号？{' '}
             <Link to="/login" className="text-primary hover:underline">
               立即登录

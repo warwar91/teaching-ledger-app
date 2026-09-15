@@ -22,7 +22,7 @@ import type { LoginDto } from './dto/login.dto';
 const BCRYPT_SALT_ROUNDS = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_DURATION_MS = 15 * 60 * 1000;
-const SESSION_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15分钟无操作自动退出
 
 @Injectable()
 export class AuthService {
