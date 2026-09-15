@@ -142,13 +142,14 @@ const RegisterPage: React.FC = () => {
               <Input
                 id="reg-username"
                 type="text"
-                placeholder="请输入用户名"
+                placeholder="请输入用户名（英文或英文+数字，不能纯数字）"
                 value={regUsername}
                 onChange={(e) => setRegUsername(e.target.value)}
                 autoComplete="username"
                 disabled={regSubmitting}
                 className="h-11 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
               />
+              <p className="text-xs text-gray-400">支持英文字母，可混合数字，不能纯数字</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="reg-password" className="text-gray-700">密码</Label>
@@ -208,7 +209,7 @@ const RegisterPage: React.FC = () => {
           </form>
           <div className="mt-6 text-center text-sm text-gray-500">
             已有账号？{' '}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-blue-600 hover:underline">
               立即登录
             </Link>
           </div>
