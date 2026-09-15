@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -26,6 +26,23 @@ const LoginPage: React.FC = () => {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
   const [loginSubmitting, setLoginSubmitting] = useState(false);
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+
+  // 生成4位随机数字验证码
+  const generateCaptcha = () => {
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+      code += Math.floor(Math.random() * 10).toString();
+    }
+    setCaptchaCode(code);
+    setCaptchaInput('');
+  };
+
+  // 组件挂载时生成验证码
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const extractErrorMsg = (err: unknown): string => {
     if (
@@ -72,6 +89,15 @@ const LoginPage: React.FC = () => {
       toast.error('请输入密码');
       return;
     }
+    if (!captchaInput.trim()) {
+      toast.error('请输入验证码');
+      return;
+    }
+    if (captchaInput.trim() !== captchaCode) {
+      toast.error('验证码错误，请重新输入');
+      generateCaptcha();
+      return;
+    }
     setLoginSubmitting(true);
     try {
       await login({
@@ -83,6 +109,7 @@ const LoginPage: React.FC = () => {
     } catch (err: unknown) {
       logger.error(`Login failed: ${JSON.stringify(err)}`);
       toast.error(extractErrorMsg(err));
+      generateCaptcha();
     } finally {
       setLoginSubmitting(false);
     }
@@ -168,6 +195,30 @@ const LoginPage: React.FC = () => {
                   ) : (
                     <Eye className="h-4 w-4" />
                   )}
+                </button>
+              </div>
+            </div>
+            {/* 验证码 */}
+            <div className="space-y-2">
+              <Label htmlFor="login-captcha" className="text-gray-700">验证码</Label>
+              <div className="flex gap-3">
+                <Input
+                  id="login-captcha"
+                  type="text"
+                  placeholder="请输入验证码"
+                  value={captchaInput}
+                  onChange={(e) => setCaptchaInput(e.target.value)}
+                  disabled={loginSubmitting}
+                  maxLength={4}
+                  className="h-11 flex-1 border-gray-200 bg-gray-50/50 focus:border-blue-400 focus:ring-blue-100"
+                />
+                <button
+                  type="button"
+                  onClick={generateCaptcha}
+                  className="h-11 px-4 rounded-md border border-gray-200 bg-gradient-to-br from-blue-50 to-indigo-50 font-mono text-lg font-bold tracking-[0.3em] text-gray-700 hover:border-gray-300 transition-colors select-none cursor-pointer"
+                  title="点击刷新验证码"
+                >
+                  {captchaCode}
                 </button>
               </div>
             </div>
