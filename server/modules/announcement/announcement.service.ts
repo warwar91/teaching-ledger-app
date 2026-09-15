@@ -1,30 +1,27 @@
 import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DRIZZLE_DATABASE } from '@server/database/database.module';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { sql } from 'drizzle-orm';
 
 @Injectable()
 export class AnnouncementService {
-  private readonly pg: any;
-
-  constructor(@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase) {
-    this.pg = (this.db as any).$client;
-  }
+  constructor(@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase) {}
 
   async findAll(page: number = 1, pageSize: number = 12) {
     const offset = (page - 1) * pageSize;
-    const rows = await this.pg`
+    const rows = await this.db.execute(sql`
       SELECT id, title, publisher, publish_date, announcement_type
       FROM announcement
       WHERE is_published = true
       ORDER BY publish_date DESC
       LIMIT ${pageSize} OFFSET ${offset}
-    `;
+    `);
 
-    const countResult = await this.pg`
+    const countResult = await this.db.execute(sql`
       SELECT COUNT(*)::int as total FROM announcement WHERE is_published = true
-    `;
+    `);
 
-    const total = Number(countResult[0]?.total || 0);
+    const total = Number((countResult as any[])[0]?.total || 0);
     return {
       list: rows,
       total,
@@ -35,20 +32,20 @@ export class AnnouncementService {
   }
 
   async findOne(id: string) {
-    const rows = await this.pg`
+    const rows = await this.db.execute(sql`
       SELECT * FROM announcement WHERE id = ${id}::uuid LIMIT 1
-    `;
-    if (rows.length === 0) {
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
-    const announcement = rows[0];
+    const announcement = (rows as any[])[0];
     if (announcement.announcement_type === 'task') {
-      const items = await this.pg`
+      const items = await this.db.execute(sql`
         SELECT id, content, deadline, sort_order
         FROM announcement_item
         WHERE announcement_id = ${id}::uuid
         ORDER BY sort_order ASC
-      `;
+      `);
       announcement.items = items;
     }
     return announcement;
@@ -65,10 +62,9 @@ export class AnnouncementService {
     items?: Array<{ content: string; deadline?: string }>;
   }) {
     const type = data.announcementType || 'regular';
-    // For task type, content can be empty; for regular, content required
-    const content = type === 'task' ? '' : data.content;
+    const content = type === 'task' ? '' : (data.content || '');
 
-    const rows = await this.pg`
+    const rows = await this.db.execute(sql`
       INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by, announcement_type)
       VALUES (
         ${data.title},
@@ -80,18 +76,17 @@ export class AnnouncementService {
         ${type}
       )
       RETURNING *
-    `;
-    const newAnnouncement = rows[0];
+    `);
+    const newAnnouncement = (rows as any[])[0];
 
-    // Insert items for task type
     if (type === 'task' && data.items && data.items.length > 0) {
       for (let i = 0; i < data.items.length; i++) {
         const item = data.items[i];
         if (item.content && item.content.trim()) {
-          await this.pg`
+          await this.db.execute(sql`
             INSERT INTO announcement_item (announcement_id, content, deadline, sort_order)
             VALUES (${newAnnouncement.id}, ${item.content.trim()}, ${item.deadline || null}, ${i})
-          `;
+          `);
         }
       }
     }
@@ -109,7 +104,7 @@ export class AnnouncementService {
     updatedBy?: string;
     items?: Array<{ id?: string; content: string; deadline?: string }>;
   }) {
-    const rows = await this.pg`
+    const rows = await this.db.execute(sql`
       UPDATE announcement SET
         title = COALESCE(${data.title || null}, title),
         content = COALESCE(${data.content || null}, content),
@@ -121,68 +116,62 @@ export class AnnouncementService {
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${id}::uuid
       RETURNING *
-    `;
-    if (rows.length === 0) {
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
 
-    // Update items if provided
     if (data.items !== undefined) {
-      // Delete existing items
-      await this.pg`DELETE FROM announcement_item WHERE announcement_id = ${id}::uuid`;
-      // Insert new items
+      await this.db.execute(sql`DELETE FROM announcement_item WHERE announcement_id = ${id}::uuid`);
       for (let i = 0; i < data.items.length; i++) {
         const item = data.items[i];
         if (item.content && item.content.trim()) {
-          await this.pg`
+          await this.db.execute(sql`
             INSERT INTO announcement_item (announcement_id, content, deadline, sort_order)
             VALUES (${id}::uuid, ${item.content.trim()}, ${item.deadline || null}, ${i})
-          `;
+          `);
         }
       }
     }
 
-    return rows[0];
+    return (rows as any[])[0];
   }
 
   async remove(id: string) {
-    const rows = await this.pg`
+    const rows = await this.db.execute(sql`
       DELETE FROM announcement WHERE id = ${id}::uuid RETURNING id
-    `;
-    if (rows.length === 0) {
+    `);
+    if ((rows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
     return { success: true };
   }
 
   async adminFindAll() {
-    const announcements = await this.pg`
+    const announcements = await this.db.execute(sql`
       SELECT * FROM announcement ORDER BY publish_date DESC
-    `;
-    // For task type, load items
+    `) as any[];
     for (const ann of announcements) {
       if (ann.announcement_type === 'task') {
-        ann.items = await this.pg`
+        ann.items = await this.db.execute(sql`
           SELECT id, content, deadline, sort_order
           FROM announcement_item
           WHERE announcement_id = ${ann.id}::uuid
           ORDER BY sort_order ASC
-        `;
+        `);
       }
     }
     return announcements;
   }
 
-  // Get user's ledgers for the "add to ledger" feature
   async getUserLedgers(userId: string) {
-    return this.pg`
+    return this.db.execute(sql`
       SELECT id, name, ledger_type FROM ledger
       WHERE owner_user_id = ${userId} AND is_deleted = false
       ORDER BY ledger_type, created_at DESC
-    `;
+    `);
   }
 
-  // Claim announcement items into user's ledger
   async claimItems(
     userId: string,
     announcementId: string,
@@ -194,40 +183,36 @@ export class AnnouncementService {
       remark?: string;
     }
   ) {
-    // Verify target ledger belongs to user
-    const ledgerRows = await this.pg`
+    const ledgerRows = await this.db.execute(sql`
       SELECT * FROM ledger WHERE id = ${targetLedgerId}::uuid AND owner_user_id = ${userId} AND is_deleted = false LIMIT 1
-    `;
-    if (ledgerRows.length === 0) {
+    `);
+    if ((ledgerRows as any[]).length === 0) {
       throw new BadRequestException('目标台账不存在或无权操作');
     }
 
-    // Verify announcement exists and is task type
-    const annRows = await this.pg`
+    const annRows = await this.db.execute(sql`
       SELECT * FROM announcement WHERE id = ${announcementId}::uuid AND is_published = true LIMIT 1
-    `;
-    if (annRows.length === 0) {
+    `);
+    if ((annRows as any[]).length === 0) {
       throw new NotFoundException('公告不存在');
     }
 
-    // Get the selected items
-    const items = await this.pg`
+    const items = await this.db.execute(sql`
       SELECT * FROM announcement_item WHERE announcement_id = ${announcementId}::uuid AND id = ANY(${itemIds}::uuid[])
-    `;
-    if (items.length === 0) {
+    `);
+    if ((items as any[]).length === 0) {
       throw new BadRequestException('未选择有效的台账条目');
     }
 
-    // Get max seq_no for this ledger
-    const maxSeqResult = await this.pg`
+    const maxSeqResult = await this.db.execute(sql`
       SELECT COALESCE(MAX(seq_no), 0) as max_seq FROM ledger_record WHERE ledger_id = ${targetLedgerId}::uuid
-    `;
-    let nextSeq = Number(maxSeqResult[0]?.max_seq || 0);
+    `);
+    let nextSeq = Number((maxSeqResult as any[])[0]?.max_seq || 0);
 
     const inserted: any[] = [];
-    for (const item of items) {
+    for (const item of items as any[]) {
       nextSeq += 1;
-      const row = await this.pg`
+      const row = await this.db.execute(sql`
         INSERT INTO ledger_record (ledger_id, seq_no, content, expected_date, main_executor, remark, progress_status, created_by)
         VALUES (
           ${targetLedgerId}::uuid,
@@ -240,8 +225,8 @@ export class AnnouncementService {
           ${userId}
         )
         RETURNING *
-      `;
-      inserted.push(row[0]);
+      `);
+      inserted.push((row as any[])[0]);
     }
 
     return { inserted: inserted.length, records: inserted };
