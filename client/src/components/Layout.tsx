@@ -65,19 +65,19 @@ const Layout: React.FC = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
-      <aside className="flex w-60 shrink-0 flex-col border-r border-gray-200 bg-white">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-gray-100 px-5">
+        <div className="flex h-20 items-center gap-3 border-b border-gray-100 px-5">
           <img
             src={logoUrl}
             alt="学院LOGO"
-            className="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-gray-100"
+            className="h-12 w-12 rounded-full object-cover shadow-sm ring-2 ring-gray-100"
           />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-gray-900 leading-tight">
+            <span className="text-base font-semibold text-gray-900 leading-tight">
               教学工作台账
             </span>
-            <span className="text-xs text-gray-500 leading-tight">
+            <span className="text-sm text-gray-500 leading-tight">
               经济学院
             </span>
           </div>

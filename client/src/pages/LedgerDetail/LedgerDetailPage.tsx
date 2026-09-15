@@ -107,6 +107,7 @@ const LedgerDetailPage: React.FC = () => {
   const [exporting, setExporting] = useState(false);
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [showEntryForm, setShowEntryForm] = useState(false);
 
   // New record rows
   const [newRows, setNewRows] = useState<NewRecordRow[]>([]);
@@ -281,6 +282,7 @@ const LedgerDetailPage: React.FC = () => {
       });
       toast.success(`成功添加 ${validRows.length} 条记录`);
       initEmptyRows();
+      setShowEntryForm(false);
       fetchDetail();
     } catch (err: unknown) {
       logger.error(`LedgerDetailPage submit failed: ${JSON.stringify(err)}`);
@@ -435,21 +437,21 @@ const LedgerDetailPage: React.FC = () => {
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12 text-center">序号</TableHead>
-                    <TableHead>内容</TableHead>
-                    <TableHead className="w-40">备注</TableHead>
-                    <TableHead className="w-28">预计完成</TableHead>
-                    <TableHead className="w-24">执行人</TableHead>
-                    <TableHead className="w-28">状态</TableHead>
-                    <TableHead className="w-24 text-right">操作</TableHead>
+                  <TableRow className="border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="w-12 text-center text-gray-600">序号</TableHead>
+                    <TableHead className="text-gray-600">内容</TableHead>
+                    <TableHead className="w-40 text-gray-600">备注</TableHead>
+                    <TableHead className="w-28 text-gray-600">预计完成</TableHead>
+                    <TableHead className="w-24 text-gray-600">执行人</TableHead>
+                    <TableHead className="w-28 text-gray-600">状态</TableHead>
+                    <TableHead className="w-24 text-right text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {detail?.records.map((record: LedgerRecordItem) => {
                     const style = getStatusStyle(record);
                     return (
-                    <TableRow key={record.id}>
+                    <TableRow key={record.id} className="border-b border-gray-100 hover:bg-gray-50/50">
                       <TableCell className="text-center text-muted-foreground">
                         {record.seqNo}
                       </TableCell>
@@ -492,16 +494,16 @@ const LedgerDetailPage: React.FC = () => {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
                               操作
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="rounded-lg border-gray-200 shadow-lg">
                             <DropdownMenuItem
                               onClick={() =>
                                 handleUpdateStatus(record.id, 'pending')
                               }
-                              className="cursor-pointer"
+                              className="cursor-pointer text-sm py-2.5"
                             >
                               标记为待处理
                             </DropdownMenuItem>
@@ -509,7 +511,7 @@ const LedgerDetailPage: React.FC = () => {
                               onClick={() =>
                                 handleUpdateStatus(record.id, 'in_progress')
                               }
-                              className="cursor-pointer"
+                              className="cursor-pointer text-sm py-2.5"
                             >
                               标记为进行中
                             </DropdownMenuItem>
@@ -517,13 +519,13 @@ const LedgerDetailPage: React.FC = () => {
                               onClick={() =>
                                 handleUpdateStatus(record.id, 'completed')
                               }
-                              className="cursor-pointer"
+                              className="cursor-pointer text-sm py-2.5"
                             >
                               标记为已完成
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteRecord(record.id)}
-                              className="cursor-pointer text-destructive focus:text-destructive"
+                              className="cursor-pointer text-red-600 focus:text-red-700 text-sm py-2.5 border-t border-gray-100 mt-1"
                             >
                               删除记录
                             </DropdownMenuItem>
@@ -538,33 +540,59 @@ const LedgerDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* New records entry area */}
+          {/* Add record button or entry form */}
+          {!showEntryForm ? (
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white/50 p-8 text-center">
+              <Button 
+                size="lg" 
+                onClick={() => {
+                  setShowEntryForm(true);
+                  initEmptyRows();
+                }}
+                className="gap-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm px-8"
+              >
+                <Plus className="h-5 w-5" />
+                新增台账记录
+              </Button>
+              <p className="mt-3 text-sm text-gray-500">点击按钮后开始录入新的工作记录</p>
+            </div>
+          ) : (
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-base font-semibold text-gray-900">
                 录入记录
               </h2>
-              <span className="text-xs text-gray-500">
-                填写后点击"提交记录"保存（空行将被忽略）
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-500">
+                  填写后点击"提交记录"保存（空行将被忽略）
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowEntryForm(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  收起
+                </Button>
+              </div>
             </div>
 
             <div className="p-5">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10 text-center">#</TableHead>
-                    <TableHead>内容 *</TableHead>
-                    <TableHead className="w-36">备注</TableHead>
-                    <TableHead className="w-32">预计完成</TableHead>
-                    <TableHead className="w-28">执行人</TableHead>
-                    <TableHead className="w-40">图片（最多2张）</TableHead>
+                  <TableRow className="border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="w-10 text-center text-gray-600">#</TableHead>
+                    <TableHead className="text-gray-600">内容 *</TableHead>
+                    <TableHead className="w-36 text-gray-600">备注</TableHead>
+                    <TableHead className="w-32 text-gray-600">预计完成</TableHead>
+                    <TableHead className="w-28 text-gray-600">执行人</TableHead>
+                    <TableHead className="w-40 text-gray-600">图片（最多2张）</TableHead>
                     <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {newRows.map((row, idx) => (
-                    <TableRow key={row.key}>
+                    <TableRow key={row.key} className="border-b border-gray-100">
                       <TableCell className="text-center text-muted-foreground">
                         {idx + 1}
                       </TableCell>
@@ -694,6 +722,7 @@ const LedgerDetailPage: React.FC = () => {
               </div>
             </div>
           </div>
+          )}
         </>
       )}
 
