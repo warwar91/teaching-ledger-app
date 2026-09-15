@@ -416,12 +416,13 @@ const LedgerDetailPage: React.FC = () => {
       ) : (
         <>
           {/* Records Table */}
-          <div className="mb-8 rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-100 px-5 py-4">
+          <div className="mb-6 sm:mb-8 rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-100 px-4 sm:px-5 py-3 sm:py-4">
               <h2 className="text-base font-semibold text-gray-900">
                 工作记录
               </h2>
             </div>
+            <div className="overflow-x-auto">
             {detail && detail.records.length === 0 ? (
               <Empty>
                 <EmptyContent>
@@ -538,18 +539,19 @@ const LedgerDetailPage: React.FC = () => {
                 </TableBody>
               </Table>
             )}
+            </div>
           </div>
 
           {/* Add record button or entry form */}
           {!showEntryForm ? (
-            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white/50 p-8 text-center">
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white/50 p-6 sm:p-8 text-center">
               <Button 
                 size="lg" 
                 onClick={() => {
                   setShowEntryForm(true);
                   initEmptyRows();
                 }}
-                className="gap-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm px-8"
+                className="gap-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm px-6 sm:px-8"
               >
                 <Plus className="h-5 w-5" />
                 新增台账记录
@@ -558,7 +560,7 @@ const LedgerDetailPage: React.FC = () => {
             </div>
           ) : (
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 sm:px-5 py-3 sm:py-4">
               <h2 className="text-base font-semibold text-gray-900">
                 录入记录
               </h2>

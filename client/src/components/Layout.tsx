@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   NavLink,
   Outlet,
@@ -10,9 +10,10 @@ import {
   HelpCircle,
   LayoutDashboard,
   LogOut,
+  Menu,
   Settings,
   Trash2,
-  User,
+  X,
 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
 import logoUrl from '@client/src/assets/logo.png';
@@ -30,6 +31,7 @@ import { useAuth } from '@client/src/contexts/AuthContext';
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -46,10 +48,15 @@ const Layout: React.FC = () => {
     }
   };
 
+  // 点击导航后关闭移动端侧边栏
+  const handleNavClick = () => {
+    setSidebarOpen(false);
+  };
+
   if (loading || !isAuthenticated || !user) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center bg-muted">
-        <div className="text-muted-foreground">加载中...</div>
+      <div className="w-screen h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500">加载中...</div>
       </div>
     );
   }
@@ -62,67 +69,107 @@ const Layout: React.FC = () => {
     { path: '/help', label: '使用说明', icon: HelpCircle, end: false },
   ];
 
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="flex h-16 sm:h-20 items-center gap-2.5 sm:gap-3 border-b border-gray-100 px-4 sm:px-5">
+        <img
+          src={logoUrl}
+          alt="学院LOGO"
+          className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover shadow-sm ring-2 ring-gray-100 shrink-0"
+        />
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm sm:text-base font-semibold text-gray-900 leading-tight truncate">
+            教学工作台账
+          </span>
+          <span className="text-xs sm:text-sm text-gray-500 leading-tight">
+            经济学院
+          </span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 p-2 sm:p-3">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.end}
+            onClick={handleNavClick}
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 sm:gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                isActive
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`
+            }
+          >
+            <item.icon className="h-4 w-4 sm:h-[18px] sm:w-[18px] shrink-0" />
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  );
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50">
-      {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="flex h-20 items-center gap-3 border-b border-gray-100 px-5">
-          <img
-            src={logoUrl}
-            alt="学院LOGO"
-            className="h-12 w-12 rounded-full object-cover shadow-sm ring-2 ring-gray-100"
-          />
-          <div className="flex flex-col">
-            <span className="text-base font-semibold text-gray-900 leading-tight">
-              教学工作台账
-            </span>
-            <span className="text-sm text-gray-500 leading-tight">
-              经济学院
-            </span>
-          </div>
-        </div>
+      {/* 桌面端侧边栏（md以上显示） */}
+      <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
+        {sidebarContent}
+      </aside>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-3">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`
-              }
-            >
-              <item.icon className="h-[18px] w-[18px]" />
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+      {/* 移动端侧边栏遮罩 */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* 移动端侧边栏抽屉 */}
+      <aside
+        className={`fixed left-0 top-0 bottom-0 z-50 w-64 shrink-0 flex flex-col border-r border-gray-200 bg-white transition-transform duration-300 md:hidden ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <button
+          onClick={() => setSidebarOpen(false)}
+          className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        {sidebarContent}
       </aside>
 
       {/* Main area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-          <div className="text-base font-semibold text-gray-900">
-            教学工作台账管理系统
+        <header className="flex h-14 sm:h-16 items-center justify-between border-b border-gray-200 bg-white px-3 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* 移动端汉堡菜单按钮 */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="text-sm sm:text-base font-semibold text-gray-900">
+              教学工作台账管理系统
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {user.role === 'admin' && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/admin')}
-                className="gap-2 border-gray-200 hover:bg-gray-50"
+                className="gap-1.5 sm:gap-2 border-gray-200 hover:bg-gray-50 text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Settings className="h-4 w-4" />
-                管理后台
+                <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">管理后台</span>
+                <span className="sm:hidden">管理</span>
               </Button>
             )}
 
@@ -131,12 +178,12 @@ const Layout: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-2.5 h-9 px-2 hover:bg-gray-100"
+                  className="gap-2 h-9 px-1.5 sm:px-2 hover:bg-gray-100"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-sm font-medium">
+                  <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs sm:text-sm font-medium">
                     {user.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.username}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border-gray-200">

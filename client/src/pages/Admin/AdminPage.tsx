@@ -205,7 +205,7 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-8">
+    <div className="mx-auto max-w-6xl p-4 sm:p-8">
       {/* Header */}
       <div className="mb-8 flex items-center gap-4">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">

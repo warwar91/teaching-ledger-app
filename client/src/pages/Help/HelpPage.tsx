@@ -217,16 +217,16 @@ const HelpPage: React.FC = () => {
   const currentSection = sections.find((s) => s.id === activeSection);
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">使用说明</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">使用说明</h1>
         <p className="mt-1 text-sm text-gray-500">
           教学工作台账管理系统 — 常见问题与操作指南
         </p>
       </div>
 
-      <div className="flex gap-6">
-        <div className="w-56 shrink-0 space-y-1">
+      <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+        <div className="md:w-56 shrink-0 space-y-1 md:border-r md:border-gray-100 md:pr-2">
           {sections.map((section) => (
             <button
               key={section.id}

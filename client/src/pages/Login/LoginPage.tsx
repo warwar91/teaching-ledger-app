@@ -130,13 +130,14 @@ const LoginPage: React.FC = () => {
       {/* 渐变叠加，增强可读性 */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/40 via-white/50 to-blue-100/40" />
 
-      <Card className="w-full max-w-md shadow-xl relative z-10 bg-white border-gray-200 rounded-2xl">
-        <CardHeader className="text-center space-y-3 pb-8">
+      <Card className="w-full max-w-md mx-4 sm:mx-0 shadow-xl relative z-10 bg-white border-gray-200 rounded-2xl">
+        <CardHeader className="text-center space-y-3 pb-6 sm:pb-8">
           <div className="mx-auto flex items-center justify-center">
             <img
               src={logoUrl}
               alt="河南开封科技传媒学院 经济学院"
-              style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              className="sm:w-24 sm:h-24"
             />
           </div>
           <div className="space-y-1">

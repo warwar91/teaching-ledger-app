@@ -164,7 +164,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
   const someSelected = selectedIds.size > 0 && selectedIds.size < ledgers.length;
 
   return (
-    <div className="mx-auto max-w-6xl p-8">
+    <div className="mx-auto max-w-6xl p-4 sm:p-8">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">

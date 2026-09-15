@@ -117,10 +117,10 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl p-8">
+    <div className="mx-auto max-w-5xl p-4 sm:p-8">
       {/* Welcome */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
           欢迎回来，{user?.username || '用户'}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -136,7 +136,7 @@ const HomePage: React.FC = () => {
       ) : (
         <>
           <div
-            className="grid gap-6 md:grid-cols-3"
+            className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
             data-ai-section-type="card-menu"
           >
             {cardItems.map((item) => (
