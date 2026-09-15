@@ -166,34 +166,38 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
   return (
     <div className="mx-auto max-w-6xl p-8">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+            <Icon className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
               共 {ledgers.length} 个台账
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {selectedIds.size > 0 && (
             <Button
               variant="outline"
               size="sm"
               onClick={handleBatchDelete}
               disabled={batchDeleting}
-              className="text-destructive border-destructive/30 hover:text-destructive"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
             >
               {batchDeleting && <Spinner className="h-4 w-4" />}
               <Trash2 className="h-4 w-4" />
               批量删除 ({selectedIds.size})
             </Button>
           )}
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Button 
+            size="sm" 
+            onClick={() => setCreateOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 shadow-sm"
+          >
             <Plus className="h-4 w-4" />
             新建台账
           </Button>
@@ -244,7 +248,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
             {ledgers.map((item) => (
               <Card
                 key={item.id}
-                className="group cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5"
+                className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-blue-100 hover:border-blue-200 border-gray-200"
                 onClick={() => navigate(`/ledger/${item.id}`)}
               >
                 <CardHeader className="pb-3">
@@ -258,14 +262,14 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
                         onClick={(e) => e.stopPropagation()}
                         aria-label={`选择 ${item.name}`}
                       />
-                      <CardTitle className="text-base font-semibold line-clamp-1">
+                      <CardTitle className="text-base font-semibold line-clamp-1 text-gray-900">
                         {item.name}
                       </CardTitle>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                      className="opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 h-8 w-8"
                       onClick={(e) => handleDelete(item.id, item.name, e)}
                       aria-label="删除"
                     >
@@ -274,25 +278,24 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2.5 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">记录条数</span>
-                      <span className="font-medium">{item.recordCount}</span>
+                      <span className="text-gray-500">记录条数</span>
+                      <span className="font-medium text-gray-900">{item.recordCount}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">未完成</span>
-                      <Badge
-                        variant={item.pendingCount > 0 ? 'destructive' : 'secondary'}
-                        className={
-                          item.pendingCount > 0 ? '' : 'text-muted-foreground'
-                        }
-                      >
-                        {item.pendingCount} 条
-                      </Badge>
+                      <span className="text-gray-500">未完成</span>
+                      {item.pendingCount > 0 ? (
+                        <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                          {item.pendingCount} 条
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">0 条</span>
+                      )}
                     </div>
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-xs text-muted-foreground">
-                        创建于 {new Date(item.createdAt).toLocaleDateString('zh-CN')}
+                    <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
+                      <span className="text-xs text-gray-400">
+                        {new Date(item.createdAt).toLocaleDateString('zh-CN')}
                       </span>
                     </div>
                   </div>

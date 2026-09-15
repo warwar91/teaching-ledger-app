@@ -360,15 +360,16 @@ const LedgerDetailPage: React.FC = () => {
             size="icon"
             onClick={() => navigate(backPath)}
             aria-label="返回"
+            className="hover:bg-gray-100"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-semibold text-foreground">
+            <h1 className="text-xl font-bold text-gray-900">
               {loading ? '加载中...' : detail?.name}
             </h1>
             {!loading && detail && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-500 mt-0.5">
                 共 {detail.records.length} 条记录
               </p>
             )}
@@ -380,13 +381,13 @@ const LedgerDetailPage: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => setReminderOpen(true)}
-              className="gap-2"
+              className="gap-2 border-gray-200 hover:bg-gray-50"
             >
               <Bell className="h-4 w-4" />
               提醒
-              <Badge variant="destructive" className="ml-1">
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">
                 {reminders.length}
-              </Badge>
+              </span>
             </Button>
           )}
           <Button
@@ -394,7 +395,7 @@ const LedgerDetailPage: React.FC = () => {
             size="sm"
             onClick={handleExport}
             disabled={exporting || loading}
-            className="gap-2"
+            className="gap-2 border-gray-200 hover:bg-gray-50"
           >
             {exporting ? (
               <Spinner className="h-4 w-4" />
@@ -413,9 +414,9 @@ const LedgerDetailPage: React.FC = () => {
       ) : (
         <>
           {/* Records Table */}
-          <div className="mb-8 rounded-lg border border-border bg-card shadow-sm">
-            <div className="border-b border-border px-4 py-3">
-              <h2 className="text-sm font-semibold text-foreground">
+          <div className="mb-8 rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-100 px-5 py-4">
+              <h2 className="text-base font-semibold text-gray-900">
                 工作记录
               </h2>
             </div>
@@ -538,17 +539,17 @@ const LedgerDetailPage: React.FC = () => {
           </div>
 
           {/* New records entry area */}
-          <div className="rounded-lg border border-border bg-card shadow-sm">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <h2 className="text-sm font-semibold text-foreground">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+              <h2 className="text-base font-semibold text-gray-900">
                 录入记录
               </h2>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-gray-500">
                 填写后点击"提交记录"保存（空行将被忽略）
               </span>
             </div>
 
-            <div className="p-4">
+            <div className="p-5">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -676,17 +677,17 @@ const LedgerDetailPage: React.FC = () => {
                 </TableBody>
               </Table>
 
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between pt-4 border-t border-gray-100">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={addRow}
-                  className="gap-1"
+                  className="gap-1 border-gray-200 hover:bg-gray-50"
                 >
                   <Plus className="h-4 w-4" />
                   增加一行
                 </Button>
-                <Button onClick={handleSubmitRecords} disabled={submitting}>
+                <Button onClick={handleSubmitRecords} disabled={submitting} className="bg-blue-600 hover:bg-blue-700 shadow-sm">
                   {submitting && <Spinner className="h-4 w-4" />}
                   提交记录
                 </Button>

@@ -90,9 +90,9 @@ const HomePage: React.FC = () => {
       count: weeklyCount,
       icon: CalendarDays,
       path: '/weekly',
-      color: 'text-primary',
-      bg: 'bg-primary/10',
-      border: 'border-primary/20',
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      shadow: 'hover:shadow-blue-100 hover:border-blue-200',
     },
     {
       title: '学期台账',
@@ -100,9 +100,9 @@ const HomePage: React.FC = () => {
       count: semesterCount,
       icon: GraduationCap,
       path: '/semester',
-      color: 'text-success',
-      bg: 'bg-success/10',
-      border: 'border-success/20',
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      shadow: 'hover:shadow-emerald-100 hover:border-emerald-200',
     },
     {
       title: '回收站',
@@ -110,9 +110,9 @@ const HomePage: React.FC = () => {
       count: recycleCount,
       icon: Trash2,
       path: '/recycle',
-      color: 'text-warning',
-      bg: 'bg-warning/10',
-      border: 'border-warning/20',
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      shadow: 'hover:shadow-amber-100 hover:border-amber-200',
     },
   ];
 
@@ -120,10 +120,10 @@ const HomePage: React.FC = () => {
     <div className="mx-auto max-w-5xl p-8">
       {/* Welcome */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-foreground">
+        <h1 className="text-2xl font-bold text-gray-900">
           欢迎回来，{user?.username || '用户'}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-gray-500">
           高效管理您的教学工作台账
         </p>
       </div>
@@ -143,21 +143,21 @@ const HomePage: React.FC = () => {
               <Card
                 key={item.title}
                 onClick={() => navigate(item.path)}
-                className={`cursor-pointer border ${item.border} transition-all hover:shadow-md hover:-translate-y-0.5`}
+                className={`cursor-pointer border-gray-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${item.shadow}`}
               >
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.bg}`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.bg}`}>
                     <item.icon className={`h-6 w-6 ${item.color}`} />
                   </div>
-                  <div className="text-3xl font-bold text-foreground">
+                  <div className="text-3xl font-bold text-gray-900">
                     {item.count}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardTitle className="text-lg font-semibold">
+                  <CardTitle className="text-lg font-semibold text-gray-900">
                     {item.title}
                   </CardTitle>
-                  <CardDescription className="mt-1">
+                  <CardDescription className="mt-1 text-gray-500">
                     {item.description}
                   </CardDescription>
                 </CardContent>

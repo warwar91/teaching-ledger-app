@@ -207,21 +207,21 @@ const AdminPage: React.FC = () => {
   return (
     <div className="mx-auto max-w-6xl p-8">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-          <Settings className="h-5 w-5 text-primary" />
+      <div className="mb-8 flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+          <Settings className="h-6 w-6 text-blue-600" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold text-foreground">管理后台</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold text-gray-900">管理后台</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
             管理所有用户及台账数据
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="users" className="w-full">
-        <TabsList>
-          <TabsTrigger value="users" className="gap-2">
+        <TabsList className="bg-gray-100 p-1">
+          <TabsTrigger value="users" className="gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Users className="h-4 w-4" />
             用户列表
           </TabsTrigger>
@@ -233,11 +233,11 @@ const AdminPage: React.FC = () => {
               <Spinner className="h-8 w-8" />
             </div>
           ) : (
-            <div className="rounded-lg border border-border bg-card shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>用户名</TableHead>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="font-semibold">用户名</TableHead>
                     <TableHead className="w-24">角色</TableHead>
                     <TableHead className="w-40">注册时间</TableHead>
                     <TableHead className="w-28 text-center">周台账数</TableHead>
@@ -247,19 +247,21 @@ const AdminPage: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {users.map((u) => (
-                    <TableRow key={u.userId}>
-                      <TableCell className="font-medium">{u.username}</TableCell>
+                    <TableRow key={u.userId} className="hover:bg-gray-50/50">
+                      <TableCell className="font-medium text-gray-900">{u.username}</TableCell>
                       <TableCell>
                         {u.role === 'admin' ? (
-                          <Badge variant="default" className="gap-1">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
                             <Shield className="h-3 w-3" />
                             管理员
-                          </Badge>
+                          </span>
                         ) : (
-                          <Badge variant="secondary">普通用户</Badge>
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                            普通用户
+                          </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-gray-500">
                         {new Date(u.createdAt).toLocaleDateString('zh-CN')}
                       </TableCell>
                       <TableCell className="text-center">{u.weeklyCount}</TableCell>

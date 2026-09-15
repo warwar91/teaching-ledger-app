@@ -63,42 +63,42 @@ const Layout: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
-      <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+      <aside className="flex w-60 shrink-0 flex-col border-r border-gray-200 bg-white">
         {/* Logo */}
-        <div className="flex h-14 items-center gap-3 border-b border-sidebar-border px-4">
+        <div className="flex h-16 items-center gap-3 border-b border-gray-100 px-5">
           <img
             src={logoUrl}
             alt="学院LOGO"
-            className="h-9 w-9 rounded-full object-cover shadow-sm"
+            className="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-gray-100"
           />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-sidebar-foreground leading-tight">
+            <span className="text-sm font-semibold text-gray-900 leading-tight">
               教学工作台账
             </span>
-            <span className="text-[10px] text-sidebar-foreground/60 leading-tight">
+            <span className="text-xs text-gray-500 leading-tight">
               经济学院
             </span>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-2">
+        <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                   isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`
               }
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-[18px] w-[18px]" />
               {item.label}
             </NavLink>
           ))}
@@ -108,8 +108,8 @@ const Layout: React.FC = () => {
       {/* Main area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-          <div className="text-lg font-semibold text-foreground">
+        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+          <div className="text-base font-semibold text-gray-900">
             教学工作台账管理系统
           </div>
 
@@ -119,7 +119,7 @@ const Layout: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/admin')}
-                className="gap-2"
+                className="gap-2 border-gray-200 hover:bg-gray-50"
               >
                 <Settings className="h-4 w-4" />
                 管理后台
@@ -131,43 +131,42 @@ const Layout: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-2 data-[state=open]:bg-muted"
+                  className="gap-2.5 h-9 px-2 hover:bg-gray-100"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-sm font-medium">
+                    {user.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium">{user.username}</span>
+                  <span className="text-sm font-medium text-gray-700">{user.username}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <div className="px-2 py-1.5">
-                  <div className="text-sm font-medium">{user.username}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {user.role === 'admin' ? '管理员' : '普通用户'}
+              <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border-gray-200">
+                <div className="px-3 py-2.5 border-b border-gray-100 mb-1">
+                  <div className="text-sm font-semibold text-gray-900">{user.username}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {user.role === 'admin' ? '系统管理员' : '普通用户'}
                   </div>
                 </div>
-                <DropdownMenuSeparator />
                 {user.role === 'admin' && (
                   <DropdownMenuItem
                     onClick={() => navigate('/admin')}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-lg py-2 px-3 text-sm"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="h-4 w-4 mr-2" />
                     管理后台
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
                   onClick={() => navigate('/help')}
-                  className="cursor-pointer"
+                  className="cursor-pointer rounded-lg py-2 px-3 text-sm"
                 >
-                  <HelpCircle className="h-4 w-4" />
+                  <HelpCircle className="h-4 w-4 mr-2" />
                   使用说明
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="cursor-pointer text-destructive focus:text-destructive"
+                  className="cursor-pointer rounded-lg py-2 px-3 text-sm text-red-600 focus:text-red-600 focus:bg-red-50"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-4 w-4 mr-2" />
                   退出登录
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -176,7 +175,7 @@ const Layout: React.FC = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-auto bg-background">
+        <main className="flex-1 overflow-auto bg-gray-50">
           <Outlet />
         </main>
       </div>
