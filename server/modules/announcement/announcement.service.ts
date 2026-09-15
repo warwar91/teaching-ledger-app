@@ -9,7 +9,9 @@ export class AnnouncementService {
   async findAll(page: number = 1, pageSize: number = 12) {
     const offset = (page - 1) * pageSize;
     const rows = await this.sql`
-      SELECT id, title, publisher, publish_date, announcement_type
+      SELECT id, title, publisher,
+        publish_date as "publishDate",
+        announcement_type as "announcementType"
       FROM announcement
       WHERE is_published = true
       ORDER BY publish_date DESC
@@ -27,15 +29,26 @@ export class AnnouncementService {
 
   async findOne(id: string) {
     const rows = await this.sql`
-      SELECT * FROM announcement WHERE id = ${id}::uuid
+      SELECT id, title, content, publisher,
+        publish_date as "publishDate",
+        attachment_url as "attachmentUrl",
+        attachment_name as "attachmentName",
+        is_published as "isPublished",
+        announcement_type as "announcementType",
+        created_at as "createdAt",
+        created_by as "createdBy",
+        updated_at as "updatedAt",
+        updated_by as "updatedBy"
+      FROM announcement WHERE id = ${id}::uuid
     `;
     if (rows.length === 0) {
       throw new NotFoundException('公告不存在');
     }
     const result: any = rows[0];
-    if (result.announcement_type === 'task') {
+    if (result.announcementType === 'task') {
       const items = await this.sql`
-        SELECT * FROM announcement_item WHERE announcement_id = ${id}::uuid ORDER BY sort_order
+        SELECT id, content, deadline, sort_order as "sortOrder"
+        FROM announcement_item WHERE announcement_id = ${id}::uuid ORDER BY sort_order
       `;
       result.items = items;
     }
@@ -58,7 +71,16 @@ export class AnnouncementService {
     const rows = await this.sql`
       INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by, announcement_type)
       VALUES (${data.title}, ${content}, ${data.publisher || null}, ${data.attachmentUrl || null}, ${data.attachmentName || null}, ${data.createdBy || null}, ${type})
-      RETURNING *
+      RETURNING id, title, content, publisher,
+        publish_date as "publishDate",
+        attachment_url as "attachmentUrl",
+        attachment_name as "attachmentName",
+        is_published as "isPublished",
+        announcement_type as "announcementType",
+        created_at as "createdAt",
+        created_by as "createdBy",
+        updated_at as "updatedAt",
+        updated_by as "updatedBy"
     `;
     const newAnnouncement = rows[0];
 
@@ -87,7 +109,7 @@ export class AnnouncementService {
     updatedBy?: string;
     items?: Array<{ id?: string; content: string; deadline?: string }>;
   }) {
-    const existing = await this.sql`SELECT * FROM announcement WHERE id = ${id}::uuid`;
+    const existing = await this.sql`SELECT id FROM announcement WHERE id = ${id}::uuid`;
     if (existing.length === 0) {
       throw new NotFoundException('公告不存在');
     }
@@ -103,7 +125,16 @@ export class AnnouncementService {
         updated_by = ${data.updatedBy || null},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${id}::uuid
-      RETURNING *
+      RETURNING id, title, content, publisher,
+        publish_date as "publishDate",
+        attachment_url as "attachmentUrl",
+        attachment_name as "attachmentName",
+        is_published as "isPublished",
+        announcement_type as "announcementType",
+        created_at as "createdAt",
+        created_by as "createdBy",
+        updated_at as "updatedAt",
+        updated_by as "updatedBy"
     `;
 
     if (data.items !== undefined) {
@@ -131,10 +162,25 @@ export class AnnouncementService {
   }
 
   async adminFindAll() {
-    const announcements = await this.sql`SELECT * FROM announcement ORDER BY publish_date DESC`;
+    const announcements = await this.sql`
+      SELECT id, title, content, publisher,
+        publish_date as "publishDate",
+        attachment_url as "attachmentUrl",
+        attachment_name as "attachmentName",
+        is_published as "isPublished",
+        announcement_type as "announcementType",
+        created_at as "createdAt",
+        created_by as "createdBy",
+        updated_at as "updatedAt",
+        updated_by as "updatedBy"
+      FROM announcement ORDER BY publish_date DESC
+    `;
     for (const ann of announcements) {
-      if (ann.announcement_type === 'task') {
-        ann.items = await this.sql`SELECT * FROM announcement_item WHERE announcement_id = ${ann.id} ORDER BY sort_order`;
+      if (ann.announcementType === 'task') {
+        ann.items = await this.sql`
+          SELECT id, content, deadline, sort_order as "sortOrder"
+          FROM announcement_item WHERE announcement_id = ${ann.id} ORDER BY sort_order
+        `;
       }
     }
     return announcements;
