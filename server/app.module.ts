@@ -22,8 +22,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     LedgerModule,
     AdminModule,
     UploadModule,
-    ViewModule,
     AnnouncementModule,
+    ViewModule,
   ],
   providers: [
     {
