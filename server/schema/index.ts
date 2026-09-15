@@ -119,7 +119,7 @@ export const ledgerRecord = pgTable('ledger_record', {
 export const announcement = pgTable('announcement', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 255 }).notNull(),
-  content: text('content').notNull(),
+  content: text('content').notNull().default(''),
   publisher: varchar('publisher', { length: 100 }),
   publishDate: timestamp('publish_date', { withTimezone: true, precision: 3 })
     .notNull()
@@ -127,6 +127,7 @@ export const announcement = pgTable('announcement', {
   attachmentUrl: varchar('attachment_url', { length: 500 }),
   attachmentName: varchar('attachment_name', { length: 255 }),
   isPublished: boolean('is_published').notNull().default(true),
+  announcementType: varchar('announcement_type', { length: 20 }).notNull().default('regular'),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
@@ -138,6 +139,14 @@ export const announcement = pgTable('announcement', {
 }, (table) => [
   index('idx_announcement_publish_date').on(table.publishDate),
 ]);
+
+export const announcementItem = pgTable('announcement_item', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  announcementId: uuid('announcement_id').notNull(),
+  content: text('content').notNull(),
+  deadline: date('deadline'),
+  sortOrder: integer('sort_order').notNull().default(0),
+});
 
 export const appUserTable = appUser;
 export const appSessionTable = appSession;
