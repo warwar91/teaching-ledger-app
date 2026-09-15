@@ -243,7 +243,7 @@ const Layout: React.FC = () => {
                   <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.username}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border-gray-200">
+              <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border-gray-200 bg-white">
                 <div className="px-3 py-2.5 border-b border-gray-100 mb-1">
                   <div className="text-sm font-semibold text-gray-900">{user.username}</div>
                   <div className="text-xs text-gray-500 mt-0.5">
