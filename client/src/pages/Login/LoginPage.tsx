@@ -37,10 +37,25 @@ const LoginPage: React.FC = () => {
     ) {
       const resp = err.response as Record<string, unknown>;
       const data = resp.data as Record<string, unknown> | undefined;
-      if (data && typeof data.message === 'string') return data.message;
-      if (data && typeof data.error === 'string') return data.error;
-      if (typeof resp.statusText === 'string' && resp.statusText) {
-        return resp.statusText;
+      if (data) {
+        // NestJS error format: { message: string | string[], error: string, statusCode: number }
+        if (typeof data.message === 'string') return data.message;
+        if (Array.isArray(data.message)) return data.message.join('；');
+        if (typeof data.error === 'string') return data.error;
+      }
+      if (typeof resp.status === 'number') {
+        switch (resp.status) {
+          case 401:
+            return '用户名或密码错误';
+          case 409:
+            return '用户名已存在';
+          case 429:
+            return '尝试次数过多，请15分钟后再试';
+          case 500:
+            return '服务器错误，请稍后重试';
+          default:
+            return `请求失败（HTTP ${resp.status}）`;
+        }
       }
     }
     if (err instanceof Error) return err.message;
