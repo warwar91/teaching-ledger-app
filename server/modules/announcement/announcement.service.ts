@@ -1,9 +1,15 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { PG_CLIENT } from '@server/database/database.module';
+import { DRIZZLE_DATABASE } from '@server/database/database.module';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 @Injectable()
 export class AnnouncementService {
-  constructor(@Inject(PG_CLIENT) private readonly pg: any) {}
+  private readonly pg: any;
+
+  constructor(@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase) {
+    // Use the underlying postgres-js client for raw queries
+    this.pg = (this.db as any).$client;
+  }
 
   async findAll(page: number = 1, pageSize: number = 12) {
     const offset = (page - 1) * pageSize;
@@ -47,19 +53,26 @@ export class AnnouncementService {
     attachmentName?: string;
     createdBy?: string;
   }) {
-    const rows = await this.pg`
-      INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by)
-      VALUES (
-        ${data.title},
-        ${data.content},
-        ${data.publisher || null},
-        ${data.attachmentUrl || null},
-        ${data.attachmentName || null},
-        ${data.createdBy || null}
-      )
-      RETURNING *
-    `;
-    return rows[0];
+    console.log('[AnnouncementService] create called with:', { title: data.title });
+    try {
+      const rows = await this.pg`
+        INSERT INTO announcement (title, content, publisher, attachment_url, attachment_name, created_by)
+        VALUES (
+          ${data.title},
+          ${data.content},
+          ${data.publisher || null},
+          ${data.attachmentUrl || null},
+          ${data.attachmentName || null},
+          ${data.createdBy || null}
+        )
+        RETURNING *
+      `;
+      console.log('[AnnouncementService] insert result:', rows);
+      return rows[0];
+    } catch (err) {
+      console.error('[AnnouncementService] insert error:', err);
+      throw err;
+    }
   }
 
   async update(id: string, data: {
@@ -101,8 +114,16 @@ export class AnnouncementService {
   }
 
   async adminFindAll() {
-    return this.pg`
-      SELECT * FROM announcement ORDER BY publish_date DESC
-    `;
+    console.log('[AnnouncementService] adminFindAll called');
+    try {
+      const rows = await this.pg`
+        SELECT * FROM announcement ORDER BY publish_date DESC
+      `;
+      console.log('[AnnouncementService] adminFindAll result count:', rows.length);
+      return rows;
+    } catch (err) {
+      console.error('[AnnouncementService] adminFindAll error:', err);
+      throw err;
+    }
   }
 }
