@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Eye,
+  FileText,
   KeyRound,
   Settings,
   Shield,
@@ -11,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
+import * as yearSummaryApi from '@client/src/api/yearSummary';
 import type {
   AdminUserItem,
   LedgerDetail,
@@ -91,6 +93,8 @@ const AdminPage: React.FC = () => {
   // Delete user dialog
   const [deleteUserTarget, setDeleteUserTarget] = useState<AdminUserItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [allYearSummaries, setAllYearSummaries] = useState<Array<any>>([]);
+  const [ysLoading, setYsLoading] = useState(false);
 
   // Redirect non-admin
   useEffect(() => {
@@ -227,6 +231,17 @@ const AdminPage: React.FC = () => {
             <Users className="h-4 w-4" />
             用户列表
           </TabsTrigger>
+          <TabsTrigger value="years" className="gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm" onClick={() => {
+            setYsLoading(true);
+            yearSummaryApi.adminListAll().then((data) => {
+              setAllYearSummaries(data);
+            }).catch(() => {
+              toast.error('加载学年总结失败');
+            }).finally(() => setYsLoading(false));
+          }}>
+            <FileText className="h-4 w-4" />
+            学年总结
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-4">
@@ -304,6 +319,49 @@ const AdminPage: React.FC = () => {
                             删除用户
                           </Button>
                         </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="years" className="mt-4">
+          {ysLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Spinner className="h-8 w-8" />
+            </div>
+          ) : allYearSummaries.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-white p-12 text-center text-gray-500">
+              暂无学年总结记录
+            </div>
+          ) : (
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-transparent">
+                    <TableHead className="text-center text-gray-600">用户名</TableHead>
+                    <TableHead className="text-center text-gray-600">学年</TableHead>
+                    <TableHead className="text-center text-gray-600">标题</TableHead>
+                    <TableHead className="text-center text-gray-600">文件名</TableHead>
+                    <TableHead className="w-32 text-center text-gray-600">上传时间</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allYearSummaries.map((item) => (
+                    <TableRow key={item.id} className="border-b border-gray-100 hover:bg-gray-50/50">
+                      <TableCell className="text-center font-medium">{item.username || item.ownerUserId}</TableCell>
+                      <TableCell className="text-center">{item.academicYear}</TableCell>
+                      <TableCell className="text-center">{item.title}</TableCell>
+                      <TableCell className="text-center max-w-[200px] truncate">{item.fileName}</TableCell>
+                      <TableCell className="text-center">{new Date(item.createdAt).toLocaleDateString('zh-CN')}</TableCell>
+                      <TableCell className="text-center">
+                        <Button variant="outline" size="sm" onClick={() => window.open(item.fileUrl, '_blank')}>
+                          查看
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
