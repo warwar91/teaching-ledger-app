@@ -269,9 +269,18 @@ const LedgerDetailPage: React.FC = () => {
 
   const handleSubmitRecords = async () => {
     if (!id) return;
+    // Validate required fields: content, expectedDate, mainExecutor
     const validRows = newRows.filter((r) => r.content.trim());
     if (validRows.length === 0) {
-      toast.error('请至少填写一条记录的内容');
+      toast.error('请至少填写一条完整的记录（内容、预计完成时间、执行人均为必填）');
+      return;
+    }
+    // Check all filled rows have required fields
+    const missingFields = validRows.find(
+      (r) => !r.expectedDate || !r.mainExecutor.trim()
+    );
+    if (missingFields) {
+      toast.error('每条记录的"预计完成时间"和"主要执行人"为必填项，请完整填写后再提交');
       return;
     }
     setSubmitting(true);
@@ -340,7 +349,15 @@ const LedgerDetailPage: React.FC = () => {
   const handleSaveEdit = async () => {
     if (!editRecord) return;
     if (!editForm.content.trim()) {
-      toast.error('内容不能为空');
+      toast.error('工作内容不能为空');
+      return;
+    }
+    if (!editForm.expectedDate) {
+      toast.error('预计完成时间为必填项');
+      return;
+    }
+    if (!editForm.mainExecutor.trim()) {
+      toast.error('主要执行人为必填项');
       return;
     }
     setEditSaving(true);
@@ -632,8 +649,8 @@ const LedgerDetailPage: React.FC = () => {
                     <TableHead className="w-10 text-center text-gray-600">#</TableHead>
                     <TableHead className="text-center text-gray-600">内容 *</TableHead>
                     <TableHead className="w-36 text-center text-gray-600">备注</TableHead>
-                    <TableHead className="w-32 text-center text-gray-600">预计完成</TableHead>
-                    <TableHead className="w-28 text-center text-gray-600">执行人</TableHead>
+                    <TableHead className="w-32 text-center text-gray-600">预计完成 *</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">执行人 *</TableHead>
                     <TableHead className="w-40 text-center text-gray-600">图片（最多2张）</TableHead>
                     <TableHead className="w-10"></TableHead>
                   </TableRow>
@@ -870,7 +887,7 @@ const LedgerDetailPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">预计完成时间</label>
+                <label className="text-sm font-medium text-gray-700">预计完成时间 *</label>
                 <Input
                   type="date"
                   className="mt-1.5"
@@ -879,7 +896,7 @@ const LedgerDetailPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">主要执行人</label>
+                <label className="text-sm font-medium text-gray-700">主要执行人 *</label>
                 <Input
                   className="mt-1.5"
                   value={editForm.mainExecutor}
