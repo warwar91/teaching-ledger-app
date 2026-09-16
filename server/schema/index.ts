@@ -72,6 +72,7 @@ export const ledger = pgTable('ledger', {
   ownerUserId: varchar('owner_user_id', { length: 64 }).notNull(),
   ledgerType: varchar('ledger_type', { length: 20 }).notNull(),
   name: varchar('name', { length: 255 }).notNull(),
+  semester: varchar('semester', { length: 20 }).notNull().default('2026-2027-1'),
   isDeleted: boolean('is_deleted').notNull().default(false),
   deletedAt: timestamp('deleted_at', { withTimezone: true, precision: 3 }),
   createdAt: timestamp('created_at', { withTimezone: true, precision: 3 })
