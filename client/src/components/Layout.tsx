@@ -16,6 +16,7 @@ import {
   Settings,
   Trash2,
   X,
+  FileText,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@client/src/utils/logger';
@@ -122,6 +123,7 @@ const Layout: React.FC = () => {
     { path: '/announcements', label: '公告通知', icon: Megaphone, end: false },
     { path: '/weekly', label: '周台账', icon: CalendarDays, end: false },
     { path: '/semester', label: '学期台账', icon: GraduationCap, end: false },
+    { path: '/year-summary', label: '学年总结', icon: FileText, end: false },
     { path: '/recycle', label: '回收站', icon: Trash2, end: false },
     { path: '/help', label: '使用说明', icon: HelpCircle, end: false },
   ];

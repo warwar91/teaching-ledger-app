@@ -71,6 +71,24 @@ export type DbType = PostgresJsDatabase;
           console.error('Migration failed: announcement tables', err);
         });
 
+        queryClient`CREATE TABLE IF NOT EXISTS year_summary (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          owner_user_id varchar(64) NOT NULL,
+          academic_year varchar(20) NOT NULL,
+          title varchar(255) NOT NULL,
+          file_url varchar(500) NOT NULL,
+          file_name varchar(255) NOT NULL,
+          file_size integer,
+          created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )`.then(() => {
+          return queryClient`CREATE INDEX IF NOT EXISTS idx_year_summary_owner_year ON year_summary (owner_user_id, academic_year)`;
+        }).then(() => {
+          console.log('Year summary table ready');
+        }).catch((err: unknown) => {
+          console.error('Migration failed: year_summary table', err);
+        });
+
         queryClient`UPDATE app_user SET password_hash = '$2b$12$rrGuBLgnQwjQ4MwuFE7Veu85cUcl4q78R8Ad.uXydj1LQ.c0bqYzW' WHERE username = 'admin'`.then(() => {
           console.log('Admin password reset to Admin@2026');
         }).catch((err: unknown) => {

@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Trash2,
   X,
+  FileText,
 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
 import type { LedgerItem, ReminderItem } from '@shared/api.interface';
@@ -103,6 +104,16 @@ const HomePage: React.FC = () => {
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
       shadow: 'hover:shadow-emerald-100 hover:border-emerald-200',
+    },
+    {
+      title: '学年总结',
+      description: '上传和管理各学年工作总结',
+      count: 0,
+      icon: FileText,
+      path: '/year-summary',
+      color: 'text-violet-600',
+      bg: 'bg-violet-50',
+      shadow: 'hover:shadow-violet-100 hover:border-violet-200',
     },
     {
       title: '回收站',

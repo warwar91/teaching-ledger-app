@@ -14,6 +14,7 @@ import HelpPage from './pages/Help/HelpPage';
 import AnnouncementListPage from './pages/Announcement/AnnouncementListPage';
 import AnnouncementDetailPage from './pages/Announcement/AnnouncementDetailPage';
 import AdminAnnouncementPage from './pages/Announcement/AdminAnnouncementPage';
+import YearSummaryPage from './pages/YearSummary/YearSummaryPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 const RoutesComponent = () => {
@@ -33,6 +34,7 @@ const RoutesComponent = () => {
           <Route path="announcements" element={<AnnouncementListPage />} />
           <Route path="announcements/:id" element={<AnnouncementDetailPage />} />
           <Route path="admin/announcements" element={<AdminAnnouncementPage />} />
+          <Route path="year-summary" element={<YearSummaryPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

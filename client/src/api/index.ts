@@ -5,3 +5,4 @@ export * as auth from './auth';
 export * as ledger from './ledger';
 export * as admin from './admin';
 export * as announcement from './announcement';
+export * as yearSummary from './yearSummary';
