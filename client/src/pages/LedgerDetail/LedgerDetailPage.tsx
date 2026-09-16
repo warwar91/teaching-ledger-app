@@ -6,6 +6,7 @@ import {
   Bell,
   Download,
   Minus,
+  Pencil,
   Plus,
 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
@@ -108,6 +109,11 @@ const LedgerDetailPage: React.FC = () => {
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
   const [reminderOpen, setReminderOpen] = useState(false);
   const [showEntryForm, setShowEntryForm] = useState(false);
+
+  // Edit record state
+  const [editRecord, setEditRecord] = useState<LedgerRecordItem | null>(null);
+  const [editForm, setEditForm] = useState({ content: '', remark: '', expectedDate: '', mainExecutor: '' });
+  const [editSaving, setEditSaving] = useState(false);
 
   // New record rows
   const [newRows, setNewRows] = useState<NewRecordRow[]>([]);
@@ -322,6 +328,41 @@ const LedgerDetailPage: React.FC = () => {
     }
   };
 
+  const openEditDialog = (record: LedgerRecordItem) => {
+    setEditRecord(record);
+    setEditForm({
+      content: record.content || '',
+      remark: record.remark || '',
+      expectedDate: record.expectedDate || '',
+      mainExecutor: record.mainExecutor || '',
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editRecord) return;
+    if (!editForm.content.trim()) {
+      toast.error('内容不能为空');
+      return;
+    }
+    setEditSaving(true);
+    try {
+      await ledger.updateRecord(editRecord.id, {
+        content: editForm.content.trim(),
+        remark: editForm.remark.trim() || null,
+        expectedDate: editForm.expectedDate || null,
+        mainExecutor: editForm.mainExecutor.trim() || null,
+      });
+      toast.success('记录已更新');
+      setEditRecord(null);
+      fetchDetail();
+    } catch (err: unknown) {
+      logger.error(`Edit record failed: ${JSON.stringify(err)}`);
+      toast.error('保存失败，请重试');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   const handleExport = async () => {
     if (!id) return;
     setExporting(true);
@@ -523,6 +564,13 @@ const LedgerDetailPage: React.FC = () => {
                               className="cursor-pointer text-sm py-2.5"
                             >
                               标记为已完成
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => openEditDialog(record)}
+                              className="cursor-pointer text-sm py-2.5"
+                            >
+                              <Pencil className="h-4 w-4 mr-2" />
+                              编辑记录
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteRecord(record.id)}
@@ -796,6 +844,70 @@ const LedgerDetailPage: React.FC = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setReminderOpen(false)}>
               关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Record Dialog */}
+      <Dialog open={!!editRecord} onOpenChange={(open) => !open && setEditRecord(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>编辑记录</DialogTitle>
+            <DialogDescription>
+              修改记录内容、预计完成时间、执行人和备注
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-gray-700">工作内容 *</label>
+              <textarea
+                className="mt-1.5 w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                rows={3}
+                value={editForm.content}
+                onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+                placeholder="请输入工作内容"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">预计完成时间</label>
+                <Input
+                  type="date"
+                  className="mt-1.5"
+                  value={editForm.expectedDate}
+                  onChange={(e) => setEditForm({ ...editForm, expectedDate: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">主要执行人</label>
+                <Input
+                  className="mt-1.5"
+                  value={editForm.mainExecutor}
+                  onChange={(e) => setEditForm({ ...editForm, mainExecutor: e.target.value })}
+                  placeholder="执行人"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">备注</label>
+              <Input
+                className="mt-1.5"
+                value={editForm.remark}
+                onChange={(e) => setEditForm({ ...editForm, remark: e.target.value })}
+                placeholder="备注（可选）"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditRecord(null)} className="border-gray-200">
+              取消
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={editSaving} className="bg-blue-600 hover:bg-blue-700">
+              {editSaving && <Spinner className="h-4 w-4 mr-1" />}
+              保存修改
             </Button>
           </DialogFooter>
         </DialogContent>
