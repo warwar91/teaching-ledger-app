@@ -903,7 +903,7 @@ const LedgerDetailPage: React.FC = () => {
             <Button variant="outline" onClick={() => setEditRecord(null)} className="border-gray-200">
               取消
             </Button>
-            <Button onClick={handleSaveEdit} disabled={editSaving} className="border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm">
+            <Button onClick={handleSaveEdit} disabled={editSaving} className="border-gray-300 bg-white hover:bg-gray-50 text-gray-900 shadow-sm">
               {editSaving && <Spinner className="h-4 w-4 mr-1" />}
               保存修改
             </Button>
