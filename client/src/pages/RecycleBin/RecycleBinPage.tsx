@@ -234,7 +234,7 @@ const RecycleBinPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-200 hover:bg-transparent">
-                <TableHead className="w-12 text-gray-600">
+                <TableHead className="w-12 text-center text-gray-600">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={(checked) =>
@@ -243,11 +243,11 @@ const RecycleBinPage: React.FC = () => {
                     aria-label="全选"
                   />
                 </TableHead>
-                <TableHead className="text-gray-600">台账名称</TableHead>
-                <TableHead className="w-24 text-gray-600">类型</TableHead>
-                <TableHead className="w-32 text-gray-600">记录数</TableHead>
-                <TableHead className="w-40 text-gray-600">删除时间</TableHead>
-                <TableHead className="w-44 text-right text-gray-600">操作</TableHead>
+                <TableHead className="text-center text-gray-600">台账名称</TableHead>
+                <TableHead className="w-24 text-center text-gray-600">类型</TableHead>
+                <TableHead className="w-32 text-center text-gray-600">记录数</TableHead>
+                <TableHead className="w-40 text-center text-gray-600">删除时间</TableHead>
+                <TableHead className="w-44 text-center text-gray-600">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -263,12 +263,12 @@ const RecycleBinPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell
-                    className="cursor-pointer hover:text-primary"
+                    className="cursor-pointer hover:text-primary text-center"
                     onClick={() => navigate(`/ledger/${item.id}`)}
                   >
                     {item.name}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Badge
                       variant={
                         item.ledgerType === 'weekly' ? 'default' : 'secondary'
@@ -277,13 +277,13 @@ const RecycleBinPage: React.FC = () => {
                       {item.ledgerType === 'weekly' ? '周台账' : '学期台账'}
                     </Badge>
                   </TableCell>
-                  <TableCell>{item.recordCount}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-center">{item.recordCount}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">
                     {item.deletedAt
                       ? new Date(item.deletedAt).toLocaleString('zh-CN')
                       : '-'}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-center">
                     <div className="inline-flex gap-1">
                       <Button
                         variant="outline"

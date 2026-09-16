@@ -6,7 +6,6 @@ import {
   Bell,
   Download,
   Minus,
-  Pencil,
   Plus,
 } from 'lucide-react';
 import { logger } from '@client/src/utils/logger';
@@ -481,12 +480,12 @@ const LedgerDetailPage: React.FC = () => {
                 <TableHeader>
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-12 text-center text-gray-600">序号</TableHead>
-                    <TableHead className="text-gray-600">内容</TableHead>
-                    <TableHead className="w-28 text-gray-600">预计完成</TableHead>
-                    <TableHead className="w-24 text-gray-600">执行人</TableHead>
-                    <TableHead className="w-40 text-gray-600">备注</TableHead>
-                    <TableHead className="w-28 text-gray-600">状态</TableHead>
-                    <TableHead className="w-24 text-right text-gray-600">操作</TableHead>
+                    <TableHead className="text-center text-gray-600">内容</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">预计完成</TableHead>
+                    <TableHead className="w-24 text-center text-gray-600">执行人</TableHead>
+                    <TableHead className="w-40 text-center text-gray-600">备注</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">状态</TableHead>
+                    <TableHead className="w-24 text-center text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -497,12 +496,12 @@ const LedgerDetailPage: React.FC = () => {
                       <TableCell className="text-center text-gray-500">
                         {record.seqNo}
                       </TableCell>
-                      <TableCell className="max-w-md">
+                      <TableCell className="max-w-md text-center">
                         <div className="text-sm leading-relaxed break-all" style={{maxWidth: '25em'}}>
                           {record.content}
                         </div>
                         {record.imageUrls && record.imageUrls.length > 0 && (
-                          <div className="mt-1 flex gap-1">
+                          <div className="mt-1 flex justify-center gap-1">
                             {record.imageUrls.slice(0, 2).map((url, idx) => (
                               <a
                                 key={idx}
@@ -517,23 +516,23 @@ const LedgerDetailPage: React.FC = () => {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm">{record.expectedDate || '-'}</TableCell>
-                      <TableCell className="text-sm">{record.mainExecutor || '-'}</TableCell>
-                      <TableCell className="max-w-[160px]">
+                      <TableCell className="text-sm text-center">{record.expectedDate || '-'}</TableCell>
+                      <TableCell className="text-sm text-center">{record.mainExecutor || '-'}</TableCell>
+                      <TableCell className="max-w-[160px] text-center">
                         {record.remark ? (
-                          <div className="text-xs text-gray-500 break-words" style={{maxWidth: '10em'}}>
+                          <div className="text-xs text-gray-500 break-words" style={{maxWidth: '10em', margin: '0 auto'}}>
                             {record.remark}
                           </div>
                         ) : (
                           <span className="text-xs text-gray-300">-</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${style.badgeClass}`}>
                           {style.label}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
@@ -569,7 +568,6 @@ const LedgerDetailPage: React.FC = () => {
                               onClick={() => openEditDialog(record)}
                               className="cursor-pointer text-sm py-2.5"
                             >
-                              <Pencil className="h-4 w-4 mr-2" />
                               编辑记录
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -632,11 +630,11 @@ const LedgerDetailPage: React.FC = () => {
                 <TableHeader>
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-10 text-center text-gray-600">#</TableHead>
-                    <TableHead className="text-gray-600">内容 *</TableHead>
-                    <TableHead className="w-36 text-gray-600">备注</TableHead>
-                    <TableHead className="w-32 text-gray-600">预计完成</TableHead>
-                    <TableHead className="w-28 text-gray-600">执行人</TableHead>
-                    <TableHead className="w-40 text-gray-600">图片（最多2张）</TableHead>
+                    <TableHead className="text-center text-gray-600">内容 *</TableHead>
+                    <TableHead className="w-36 text-center text-gray-600">备注</TableHead>
+                    <TableHead className="w-32 text-center text-gray-600">预计完成</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">执行人</TableHead>
+                    <TableHead className="w-40 text-center text-gray-600">图片（最多2张）</TableHead>
                     <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -905,7 +903,7 @@ const LedgerDetailPage: React.FC = () => {
             <Button variant="outline" onClick={() => setEditRecord(null)} className="border-gray-200">
               取消
             </Button>
-            <Button onClick={handleSaveEdit} disabled={editSaving} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSaveEdit} disabled={editSaving} className="border-gray-300 bg-white hover:bg-gray-50 text-gray-700 shadow-sm">
               {editSaving && <Spinner className="h-4 w-4 mr-1" />}
               保存修改
             </Button>

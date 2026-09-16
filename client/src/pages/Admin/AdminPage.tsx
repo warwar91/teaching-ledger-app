@@ -239,19 +239,19 @@ const AdminPage: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-transparent">
-                    <TableHead className="font-semibold text-gray-600">用户名</TableHead>
-                    <TableHead className="w-24 text-gray-600">角色</TableHead>
-                    <TableHead className="w-40 text-gray-600">注册时间</TableHead>
+                    <TableHead className="font-semibold text-center text-gray-600">用户名</TableHead>
+                    <TableHead className="w-24 text-center text-gray-600">角色</TableHead>
+                    <TableHead className="w-40 text-center text-gray-600">注册时间</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">周台账数</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">学期台账数</TableHead>
-                      <TableHead className="w-60 text-right text-gray-600">操作</TableHead>
+                    <TableHead className="w-60 text-center text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users.map((u) => (
                     <TableRow key={u.userId} className="border-b border-gray-100 hover:bg-gray-50/50">
-                      <TableCell className="font-medium text-gray-900">{u.username}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-center text-gray-900">{u.username}</TableCell>
+                      <TableCell className="text-center">
                         {u.role === 'admin' ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
                             <Shield className="h-3 w-3" />
@@ -263,12 +263,12 @@ const AdminPage: React.FC = () => {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-gray-500">
+                      <TableCell className="text-center text-gray-500">
                         {new Date(u.createdAt).toLocaleDateString('zh-CN')}
                       </TableCell>
                       <TableCell className="text-center">{u.weeklyCount}</TableCell>
                       <TableCell className="text-center">{u.semesterCount}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <div className="inline-flex gap-1">
                           <Button
                             variant="outline"
@@ -353,11 +353,11 @@ const AdminPage: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
-                    <TableHead className="text-gray-600">台账名称</TableHead>
-                    <TableHead className="w-20 text-gray-600">类型</TableHead>
+                    <TableHead className="text-center text-gray-600">台账名称</TableHead>
+                    <TableHead className="w-20 text-center text-gray-600">类型</TableHead>
                     <TableHead className="w-20 text-center text-gray-600">记录数</TableHead>
-                    <TableHead className="w-28 text-gray-600">创建时间</TableHead>
-                    <TableHead className="w-20 text-right text-gray-600">操作</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">创建时间</TableHead>
+                    <TableHead className="w-20 text-center text-gray-600">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -442,10 +442,10 @@ const AdminPage: React.FC = () => {
                 <TableHeader>
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-12 text-center text-gray-600">#</TableHead>
-                    <TableHead className="text-gray-600">内容</TableHead>
-                    <TableHead className="w-28 text-gray-600">预计完成时间</TableHead>
-                    <TableHead className="w-24 text-gray-600">执行人</TableHead>
-                    <TableHead className="w-20 text-gray-600">状态</TableHead>
+                    <TableHead className="text-center text-gray-600">内容</TableHead>
+                    <TableHead className="w-28 text-center text-gray-600">预计完成时间</TableHead>
+                    <TableHead className="w-24 text-center text-gray-600">执行人</TableHead>
+                    <TableHead className="w-20 text-center text-gray-600">状态</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
