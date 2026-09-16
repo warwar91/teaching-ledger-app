@@ -36,10 +36,12 @@ export class LedgerController {
   async getLedgerList(
     @CurrentUser('userId') userId: string,
     @Query('type') type?: string,
+    @Query('semester') semester?: string,
   ): Promise<LedgerItem[]> {
     return this.ledgerService.getLedgerList(
       userId,
       type as 'weekly' | 'semester' | undefined,
+      semester,
     );
   }
 

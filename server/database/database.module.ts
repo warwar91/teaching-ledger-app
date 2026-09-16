@@ -39,6 +39,14 @@ export type DbType = PostgresJsDatabase;
           console.error('Migration failed: add remark column', err);
         });
 
+        queryClient`ALTER TABLE ledger ADD COLUMN IF NOT EXISTS semester varchar(20) DEFAULT '2026-2027-1'`.then(() => {
+          return queryClient`UPDATE ledger SET semester = '2026-2027-1' WHERE semester IS NULL`;
+        }).then(() => {
+          console.log('Ledger semester column ready');
+        }).catch((err: unknown) => {
+          console.error('Migration failed: ledger semester column', err);
+        });
+
         queryClient`CREATE EXTENSION IF NOT EXISTS pgcrypto`.then(() => {
           return queryClient`CREATE TABLE IF NOT EXISTS announcement (
             id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

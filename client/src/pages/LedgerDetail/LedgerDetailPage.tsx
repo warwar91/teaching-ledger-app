@@ -498,7 +498,7 @@ const LedgerDetailPage: React.FC = () => {
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-12 text-center text-gray-600">序号</TableHead>
                     <TableHead className="text-center text-gray-600">内容</TableHead>
-                    <TableHead className="w-28 text-center text-gray-600">预计完成</TableHead>
+                    <TableHead className="w-32 text-center text-gray-600">预计完成日期</TableHead>
                     <TableHead className="w-24 text-center text-gray-600">执行人</TableHead>
                     <TableHead className="w-40 text-center text-gray-600">备注</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">状态</TableHead>
@@ -649,7 +649,7 @@ const LedgerDetailPage: React.FC = () => {
                     <TableHead className="w-10 text-center text-gray-600">#</TableHead>
                     <TableHead className="text-center text-gray-600">内容 *</TableHead>
                     <TableHead className="w-36 text-center text-gray-600">备注</TableHead>
-                    <TableHead className="w-32 text-center text-gray-600">预计完成 *</TableHead>
+                    <TableHead className="w-36 text-center text-gray-600">预计完成日期 *</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">执行人 *</TableHead>
                     <TableHead className="w-40 text-center text-gray-600">图片（最多2张）</TableHead>
                     <TableHead className="w-10"></TableHead>

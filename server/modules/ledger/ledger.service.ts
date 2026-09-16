@@ -93,11 +93,15 @@ export class LedgerService {
   async getLedgerList(
     userId: string,
     type?: 'weekly' | 'semester',
+    semester?: string,
   ): Promise<LedgerItem[]> {
     try {
       const conditions = [eq(ledger.ownerUserId, userId), eq(ledger.isDeleted, false)];
       if (type) {
         conditions.push(eq(ledger.ledgerType, type));
+      }
+      if (semester) {
+        conditions.push(eq(ledger.semester, semester));
       }
 
       const ledgers = await this.db
@@ -146,6 +150,7 @@ export class LedgerService {
           ownerUserId: userId,
           name: dto.name.trim(),
           ledgerType: dto.ledgerType,
+          semester: dto.semester || '2026-2027-1',
         })
         .returning();
 

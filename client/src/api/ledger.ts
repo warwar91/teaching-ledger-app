@@ -16,10 +16,11 @@ import {
 
 export async function getLedgerList(
   type: 'weekly' | 'semester',
+  semester?: string,
 ): Promise<LedgerItem[]> {
   try {
     const res = await http.get<LedgerItem[]>('/ledger/list', {
-      params: { type },
+      params: { type, ...(semester ? { semester } : {}) },
     });
     return res.data;
   } catch (err: unknown) {

@@ -21,6 +21,10 @@ export class CreateLedgerDto {
   @IsString()
   @IsIn(['weekly', 'semester'], { message: '台账类型必须是 weekly 或 semester' })
   ledgerType: 'weekly' | 'semester';
+
+  @IsString()
+  @IsNotEmpty({ message: '学期不能为空' })
+  semester: string;
 }
 
 export class UpdateRecordDto {

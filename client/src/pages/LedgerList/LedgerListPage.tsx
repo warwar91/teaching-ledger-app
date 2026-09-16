@@ -39,8 +39,26 @@ import {
 } from '@client/src/components/ui/dialog';
 import { Checkbox } from '@client/src/components/ui/checkbox';
 import { Badge } from '@client/src/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/src/components/ui/select';
 import { ledger } from '@client/src/api';
 import { showConfirm } from '@client/src/utils/show-confirm';
+
+const SEMESTERS = [
+  { value: '2026-2027-1', label: '2026-2027第一学期' },
+  { value: '2026-2027-2', label: '2026-2027第二学期' },
+  { value: '2027-2028-1', label: '2027-2028第一学期' },
+  { value: '2027-2028-2', label: '2027-2028第二学期' },
+  { value: '2028-2029-1', label: '2028-2029第一学期' },
+  { value: '2028-2029-2', label: '2028-2029第二学期' },
+  { value: '2029-2030-1', label: '2029-2030第一学期' },
+  { value: '2029-2030-2', label: '2029-2030第二学期' },
+];
 
 interface LedgerListPageProps {
   ledgerType: LedgerType;
@@ -55,6 +73,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
   const [creating, setCreating] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
+  const [semester, setSemester] = useState('2026-2027-1');
 
   const title = ledgerType === 'weekly' ? '周台账' : '学期台账';
   const Icon = ledgerType === 'weekly' ? CalendarDays : GraduationCap;
@@ -62,7 +81,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
   const fetchLedgers = useCallback(async () => {
     setLoading(true);
     try {
-      const list = await ledger.getLedgerList(ledgerType);
+      const list = await ledger.getLedgerList(ledgerType, semester);
       setLedgers(list);
     } catch (err: unknown) {
       logger.error(`LedgerListPage fetch failed: ${JSON.stringify(err)}`);
@@ -70,7 +89,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
     } finally {
       setLoading(false);
     }
-  }, [ledgerType]);
+  }, [ledgerType, semester]);
 
   useEffect(() => {
     fetchLedgers();
@@ -87,6 +106,7 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
       const item = await ledger.createLedger({
         name: newName.trim(),
         ledgerType,
+        semester,
       });
       toast.success('创建成功');
       setCreateOpen(false);
@@ -180,6 +200,16 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
         </div>
 
         <div className="flex items-center gap-3">
+          <Select value={semester} onValueChange={setSemester}>
+            <SelectTrigger className="w-48 border-gray-200">
+              <SelectValue placeholder="选择学期" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {SEMESTERS.map((s) => (
+                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {selectedIds.size > 0 && (
             <Button
               variant="outline"
