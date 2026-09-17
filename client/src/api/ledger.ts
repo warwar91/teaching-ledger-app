@@ -60,6 +60,15 @@ export async function deleteLedger(id: string): Promise<void> {
   }
 }
 
+export async function renameLedger(id: string, name: string): Promise<void> {
+  try {
+    await http.patch(`/ledger/${id}/rename`, { name });
+  } catch (err: unknown) {
+    logger.error(`ledger.renameLedger failed: ${JSON.stringify(err)}`);
+    throw err;
+  }
+}
+
 export async function batchDeleteLedgers(ids: string[]): Promise<void> {
   try {
     await http.post('/ledger/batch-delete', { ids });

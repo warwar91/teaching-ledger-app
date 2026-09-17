@@ -129,6 +129,15 @@ export class LedgerController {
     return { success: true };
   }
 
+  @Patch(':id/rename')
+  async renameLedger(
+    @CurrentUser('userId') userId: string,
+    @Param('id') id: string,
+    @Body() body: { name: string },
+  ) {
+    return this.ledgerService.renameLedger(userId, id, body.name);
+  }
+
   @Post(':id/records')
   async createRecords(
     @CurrentUser('userId') userId: string,

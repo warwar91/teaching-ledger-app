@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FileText, Upload, Download, Trash2, Eye, FolderOpen } from 'lucide-react';
+import { FileText, Upload, Download, Trash2, Eye, FolderOpen, MoreVertical, Pencil } from 'lucide-react';
 import { Button } from '@client/src/components/ui/button';
 import { Input } from '@client/src/components/ui/input';
 import {
@@ -18,6 +18,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@client/src/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@client/src/components/ui/dropdown-menu';
 import { Spinner } from '@client/src/components/ui/spinner';
 import {
   Empty,
@@ -41,6 +47,9 @@ const YearSummaryPage: React.FC = () => {
   const [form, setForm] = useState({ title: '', file: null as File | null });
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [renameTarget, setRenameTarget] = useState<yearSummaryApi.YearSummaryItem | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [renaming, setRenaming] = useState(false);
 
   useEffect(() => {
     yearSummaryApi.getYears().then((y) => {
@@ -116,6 +125,30 @@ const YearSummaryPage: React.FC = () => {
   const handlePreview = (url: string) => {
     setPreviewUrl(url);
     setPreviewOpen(true);
+  };
+
+  const openRename = (item: yearSummaryApi.YearSummaryItem) => {
+    setRenameTarget(item);
+    setRenameValue(item.title);
+  };
+
+  const handleRename = async () => {
+    if (!renameTarget) return;
+    if (!renameValue.trim()) {
+      toast.error('请输入标题');
+      return;
+    }
+    setRenaming(true);
+    try {
+      await yearSummaryApi.updateSummary(renameTarget.id, { title: renameValue.trim() });
+      toast.success('重命名成功');
+      setRenameTarget(null);
+      fetchItems(selectedYear);
+    } catch (err) {
+      toast.error('重命名失败');
+    } finally {
+      setRenaming(false);
+    }
   };
 
   const formatSize = (bytes: number) => {
@@ -210,14 +243,34 @@ const YearSummaryPage: React.FC = () => {
                       >
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-600 hover:bg-gray-100"
+                          aria-label="操作"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white">
+                        <DropdownMenuItem
+                          onClick={() => openRename(item)}
+                          className="cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          重命名
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(item.id)}
+                          className="cursor-pointer text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          删除
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     </div>
                   </td>
                 </tr>
@@ -287,6 +340,36 @@ const YearSummaryPage: React.FC = () => {
               </Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename Dialog */}
+      <Dialog open={!!renameTarget} onOpenChange={(open) => !open && setRenameTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>重命名总结</DialogTitle>
+            <DialogDescription>请输入新的总结标题。</DialogDescription>
+          </DialogHeader>
+          <div className="py-2">
+            <Input
+              placeholder="请输入新标题"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRename();
+              }}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameTarget(null)} disabled={renaming}>
+              取消
+            </Button>
+            <Button onClick={handleRename} disabled={renaming}>
+              {renaming && <Spinner className="h-4 w-4" />}
+              保存
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

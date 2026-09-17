@@ -197,6 +197,27 @@ export class LedgerService {
     }
   }
 
+  async renameLedger(userId: string, id: string, name: string): Promise<{ id: string; name: string }> {
+    try {
+      if (!name || !name.trim()) {
+        throw new BadRequestException('台账名称不能为空');
+      }
+      await this.verifyLedgerOwner(userId, id);
+      const updated = await this.db
+        .update(ledger)
+        .set({ name: name.trim(), updatedAt: new Date() })
+        .where(eq(ledger.id, id))
+        .returning({ id: ledger.id, name: ledger.name });
+      if (updated.length === 0) {
+        throw new NotFoundException('台账不存在');
+      }
+      return { id: updated[0].id, name: updated[0].name };
+    } catch (error) {
+      this.logger.error(`重命名台账失败: id=${id}`, JSON.stringify(error));
+      throw error;
+    }
+  }
+
   async deleteLedger(userId: string, id: string): Promise<void> {
     try {
       await this.verifyLedgerOwner(userId, id);

@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import {
   CalendarDays,
   GraduationCap,
+  MoreVertical,
+  Pencil,
   Plus,
   Trash2,
 } from 'lucide-react';
@@ -46,6 +48,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/src/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@client/src/components/ui/dropdown-menu';
 import { ledger } from '@client/src/api';
 import { showConfirm } from '@client/src/utils/show-confirm';
 
@@ -74,6 +82,9 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
   const [semester, setSemester] = useState('2026-2027-1');
+  const [renameTarget, setRenameTarget] = useState<LedgerItem | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [renaming, setRenaming] = useState(false);
 
   const title = ledgerType === 'weekly' ? '周台账' : '学期台账';
   const Icon = ledgerType === 'weekly' ? CalendarDays : GraduationCap;
@@ -135,6 +146,32 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
     } catch (err: unknown) {
       logger.error(`LedgerListPage delete failed: ${JSON.stringify(err)}`);
       toast.error('删除失败');
+    }
+  };
+
+  const openRename = (item: LedgerItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRenameTarget(item);
+    setRenameValue(item.name);
+  };
+
+  const handleRename = async () => {
+    if (!renameTarget) return;
+    if (!renameValue.trim()) {
+      toast.error('请输入台账名称');
+      return;
+    }
+    setRenaming(true);
+    try {
+      await ledger.renameLedger(renameTarget.id, renameValue.trim());
+      toast.success('重命名成功');
+      setRenameTarget(null);
+      fetchLedgers();
+    } catch (err: unknown) {
+      logger.error(`LedgerListPage rename failed: ${JSON.stringify(err)}`);
+      toast.error('重命名失败');
+    } finally {
+      setRenaming(false);
     }
   };
 
@@ -296,15 +333,35 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
                         {item.name}
                       </CardTitle>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 h-8 w-8"
-                      onClick={(e) => handleDelete(item.id, item.name, e)}
-                      aria-label="删除"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100 h-8 w-8"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label="操作"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white">
+                        <DropdownMenuItem
+                          onClick={(e) => openRename(item, e)}
+                          className="cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          重命名
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => handleDelete(item.id, item.name, e)}
+                          className="cursor-pointer text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          删除
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -367,6 +424,42 @@ const LedgerListPage: React.FC<LedgerListPageProps> = ({ ledgerType }) => {
             <Button onClick={handleCreate} disabled={creating}>
               {creating && <Spinner className="h-4 w-4" />}
               创建
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename Dialog */}
+      <Dialog open={!!renameTarget} onOpenChange={(open) => !open && setRenameTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>重命名{title}</DialogTitle>
+            <DialogDescription>
+              请输入新的台账名称。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2">
+            <Input
+              placeholder="请输入新名称"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRename();
+              }}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenameTarget(null)}
+              disabled={renaming}
+            >
+              取消
+            </Button>
+            <Button onClick={handleRename} disabled={renaming}>
+              {renaming && <Spinner className="h-4 w-4" />}
+              保存
             </Button>
           </DialogFooter>
         </DialogContent>
