@@ -237,12 +237,9 @@ const Layout: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-2 h-9 px-1.5 sm:px-2 hover:bg-gray-100"
+                  className="gap-1 h-9 px-2 hover:bg-gray-100"
                 >
-                  <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs sm:text-sm font-medium">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.username}</span>
+                  <span className="text-sm font-medium text-gray-700">{user.username}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border-gray-200 bg-white">
