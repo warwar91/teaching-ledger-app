@@ -305,7 +305,16 @@ const YearSummaryPage: React.FC = () => {
                 type="file"
                 accept=".pdf,.doc,.docx"
                 className="mt-1.5"
-                onChange={(e) => setForm({ ...form, file: e.target.files?.[0] || null })}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  // 自动用文件名（去扩展名）作为默认标题
+                  if (f && !form.title.trim()) {
+                    const base = f.name.replace(/\.(pdf|docx?)$/i, '');
+                    setForm({ ...form, file: f, title: base });
+                  } else {
+                    setForm({ ...form, file: f });
+                  }
+                }}
               />
               <p className="text-xs text-gray-400 mt-1">支持 PDF、Word 格式，单个文件不超过 2MB</p>
             </div>

@@ -278,7 +278,7 @@ const AnnouncementDetailPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">备注（可选）</label>
+              <label className="text-sm font-medium text-gray-700">要求（可选）</label>
               <textarea
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}

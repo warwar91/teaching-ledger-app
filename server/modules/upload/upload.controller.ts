@@ -83,6 +83,17 @@ export class UploadController {
     if (!file) {
       throw new BadRequestException('未找到上传文件');
     }
-    return { url: `/uploads/${file.filename}`, originalName: file.originalname };
+    // multer 默认以 latin1 解码 multipart 文件名，中文等非 ASCII 字符需转回 UTF-8
+    let originalName = file.originalname;
+    try {
+      const decoded = Buffer.from(file.originalname, 'latin1').toString('utf8');
+      // 只有当解码结果包含可打印的中文字符或与原串不同时才采用
+      if (/[\u4e00-\u9fff]/.test(decoded)) {
+        originalName = decoded;
+      }
+    } catch {
+      // 忽略解码失败，保留原串
+    }
+    return { url: `/uploads/${file.filename}`, originalName };
   }
 }

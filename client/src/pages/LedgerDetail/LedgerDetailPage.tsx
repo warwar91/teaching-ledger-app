@@ -500,7 +500,7 @@ const LedgerDetailPage: React.FC = () => {
                     <TableHead className="text-center text-gray-600">内容</TableHead>
                     <TableHead className="w-32 text-center text-gray-600">预计完成日期</TableHead>
                     <TableHead className="w-24 text-center text-gray-600">执行人</TableHead>
-                    <TableHead className="w-40 text-center text-gray-600">备注</TableHead>
+                    <TableHead className="w-40 text-center text-gray-600">要求</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">状态</TableHead>
                     <TableHead className="w-24 text-center text-gray-600">操作</TableHead>
                   </TableRow>
@@ -648,7 +648,7 @@ const LedgerDetailPage: React.FC = () => {
                   <TableRow className="border-b border-gray-200 hover:bg-transparent">
                     <TableHead className="w-10 text-center text-gray-600">#</TableHead>
                     <TableHead className="text-center text-gray-600">内容 *</TableHead>
-                    <TableHead className="w-36 text-center text-gray-600">备注</TableHead>
+                    <TableHead className="w-36 text-center text-gray-600">要求</TableHead>
                     <TableHead className="w-36 text-center text-gray-600">预计完成日期 *</TableHead>
                     <TableHead className="w-28 text-center text-gray-600">执行人 *</TableHead>
                     <TableHead className="w-40 text-center text-gray-600">图片（最多2张）</TableHead>
@@ -672,7 +672,7 @@ const LedgerDetailPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Input
-                          placeholder="备注（可选）"
+                          placeholder="要求（可选）"
                           value={row.remark}
                           onChange={(e) =>
                             updateRow(row.key, 'remark', e.target.value)
@@ -870,7 +870,7 @@ const LedgerDetailPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>编辑记录</DialogTitle>
             <DialogDescription>
-              修改记录内容、预计完成时间、执行人和备注
+              修改记录内容、预计完成时间、执行人和要求
             </DialogDescription>
           </DialogHeader>
 
@@ -906,12 +906,12 @@ const LedgerDetailPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">备注</label>
+              <label className="text-sm font-medium text-gray-700">要求</label>
               <Input
                 className="mt-1.5"
                 value={editForm.remark}
                 onChange={(e) => setEditForm({ ...editForm, remark: e.target.value })}
-                placeholder="备注（可选）"
+                placeholder="要求（可选）"
               />
             </div>
           </div>
