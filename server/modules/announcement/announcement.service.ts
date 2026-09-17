@@ -230,7 +230,7 @@ export class AnnouncementService {
         .map((r) => ({
           id: r.id,
           content: r.content,
-          deadline: r.expectedDate || undefined,
+          deadline: r.expectedDate ? new Date(r.expectedDate).toISOString().slice(0, 10) : undefined,
           mainExecutor: r.mainExecutor || undefined,
         })),
     }));

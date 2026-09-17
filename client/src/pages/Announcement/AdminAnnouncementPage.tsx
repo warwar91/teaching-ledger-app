@@ -20,6 +20,18 @@ import { Button } from '@client/src/components/ui/button';
 import { Input } from '@client/src/components/ui/input';
 import { Checkbox } from '@client/src/components/ui/checkbox';
 
+const SEMESTER_LABELS: Record<string, string> = {
+  '2026-2027-1': '2026-2027第一学期',
+  '2026-2027-2': '2026-2027第二学期',
+  '2027-2028-1': '2027-2028第一学期',
+  '2027-2028-2': '2027-2028第二学期',
+  '2028-2029-1': '2028-2029第一学期',
+  '2028-2029-2': '2028-2029第二学期',
+  '2029-2030-1': '2029-2030第一学期',
+  '2029-2030-2': '2029-2030第二学期',
+};
+const fmtSemester = (s: string) => SEMESTER_LABELS[s] || s;
+
 const AdminAnnouncementPage: React.FC = () => {
   const [list, setList] = useState<AnnouncementDetail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -581,7 +593,7 @@ const AdminAnnouncementPage: React.FC = () => {
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    {sem.replace('-1', '第一学期').replace('-2', '第二学期')}
+                    {fmtSemester(sem)}
                   </button>
                 ))}
               </div>
@@ -596,7 +608,7 @@ const AdminAnnouncementPage: React.FC = () => {
                         <FolderOpen className="h-4 w-4 text-gray-500" />
                         <span className="text-sm font-medium text-gray-800">{lg.name}</span>
                         <span className="text-xs text-gray-400">
-                          （{lg.ledgerType === 'weekly' ? '周台账' : '学期台账'} · {lg.semester.replace('-1', '第一学期').replace('-2', '第二学期')}）
+                          （{lg.ledgerType === 'weekly' ? '周台账' : '学期台账'} · {fmtSemester(lg.semester)}）
                         </span>
                       </div>
                       <div className="divide-y divide-gray-100">
