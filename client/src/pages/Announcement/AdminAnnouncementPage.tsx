@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   Megaphone, Plus, Pencil, Trash2, X, Paperclip,
-  CalendarDays, User, Eye, EyeOff, ClipboardList,
+  CalendarDays, User, Eye, EyeOff, ClipboardList, FolderOpen, Import,
 } from 'lucide-react';
 import {
   announcementApi,
@@ -18,6 +18,7 @@ import {
 } from '@client/src/components/ui/dialog';
 import { Button } from '@client/src/components/ui/button';
 import { Input } from '@client/src/components/ui/input';
+import { Checkbox } from '@client/src/components/ui/checkbox';
 
 const AdminAnnouncementPage: React.FC = () => {
   const [list, setList] = useState<AnnouncementDetail[]>([]);
@@ -38,6 +39,18 @@ const AdminAnnouncementPage: React.FC = () => {
   const [items, setItems] = useState<Array<{ content: string; deadline: string }>>([
     { content: '', deadline: '' },
   ]);
+  // Picker state
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerLoading, setPickerLoading] = useState(false);
+  const [pickerLedgers, setPickerLedgers] = useState<Array<{
+    id: string;
+    name: string;
+    ledgerType: string;
+    semester: string;
+    records: Array<{ id: string; content: string; deadline?: string; mainExecutor?: string }>;
+  }>>([]);
+  const [pickerSelected, setPickerSelected] = useState<Set<string>>(new Set());
+  const [pickerSemesterFilter, setPickerSemesterFilter] = useState<string>('all');
 
   const loadList = async () => {
     setLoading(true);
@@ -98,6 +111,51 @@ const AdminAnnouncementPage: React.FC = () => {
     const newItems = [...items];
     newItems[idx][field] = value;
     setItems(newItems);
+  };
+
+  const openPicker = async () => {
+    setPickerOpen(true);
+    setPickerLoading(true);
+    setPickerSelected(new Set());
+    setPickerSemesterFilter('all');
+    try {
+      const res = await announcementApi.getAdminLedgersWithRecords();
+      setPickerLedgers(res.data || []);
+    } catch (err) {
+      toast.error('加载台账失败');
+      setPickerOpen(false);
+    } finally {
+      setPickerLoading(false);
+    }
+  };
+
+  const toggleRecord = (recordId: string) => {
+    setPickerSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(recordId)) next.delete(recordId);
+      else next.add(recordId);
+      return next;
+    });
+  };
+
+  const confirmPicker = () => {
+    const picked: Array<{ content: string; deadline: string }> = [];
+    for (const lg of pickerLedgers) {
+      for (const r of lg.records) {
+        if (pickerSelected.has(r.id)) {
+          picked.push({ content: r.content, deadline: r.deadline || '' });
+        }
+      }
+    }
+    if (picked.length === 0) {
+      toast.error('请至少选择一条台账记录');
+      return;
+    }
+    // 去掉空占位行（如果全是空的）
+    const existing = items.filter((it) => it.content.trim());
+    setItems([...existing, ...picked]);
+    toast.success(`已添加 ${picked.length} 条台账记录`);
+    setPickerOpen(false);
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -365,8 +423,22 @@ const AdminAnnouncementPage: React.FC = () => {
             {/* Task type: dynamic items */}
             {announcementType === 'task' && (
               <div>
-                <label className="text-sm font-medium text-gray-700">台账条目</label>
-                <p className="text-xs text-gray-500 mt-0.5">用户可逐条选择并添加到自己的周台账或学期台账</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">台账条目</label>
+                    <p className="text-xs text-gray-500 mt-0.5">用户可逐条选择并添加到自己的周台账或学期台账</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={openPicker}
+                    className="gap-1.5 border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    <Import className="h-4 w-4" />
+                    从已有台账选择
+                  </Button>
+                </div>
                 <div className="mt-2 space-y-2">
                   {items.map((item, idx) => (
                     <div key={idx} className="flex gap-2 items-start">
@@ -467,6 +539,104 @@ const AdminAnnouncementPage: React.FC = () => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Picker Dialog: choose records from existing ledgers */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>从已有台账选择</DialogTitle>
+          </DialogHeader>
+          {pickerLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Spinner className="h-8 w-8" />
+            </div>
+          ) : pickerLedgers.length === 0 ? (
+            <div className="py-12 text-center text-sm text-gray-500">
+              您还没有任何台账记录，请先到周台账或学期台账中录入记录
+            </div>
+          ) : (
+            <>
+              {/* Semester filter */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-600">学期筛选：</span>
+                <button
+                  onClick={() => setPickerSemesterFilter('all')}
+                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                    pickerSemesterFilter === 'all'
+                      ? 'border-blue-400 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  全部
+                </button>
+                {Array.from(new Set(pickerLedgers.map((l) => l.semester))).map((sem) => (
+                  <button
+                    key={sem}
+                    onClick={() => setPickerSemesterFilter(sem)}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                      pickerSemesterFilter === sem
+                        ? 'border-blue-400 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {sem.replace('-1', '第一学期').replace('-2', '第二学期')}
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-4 mt-4">
+                {pickerLedgers
+                  .filter((l) => pickerSemesterFilter === 'all' || l.semester === pickerSemesterFilter)
+                  .filter((l) => l.records.length > 0)
+                  .map((lg) => (
+                    <div key={lg.id} className="rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50/60 px-3 py-2">
+                        <FolderOpen className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-800">{lg.name}</span>
+                        <span className="text-xs text-gray-400">
+                          （{lg.ledgerType === 'weekly' ? '周台账' : '学期台账'} · {lg.semester.replace('-1', '第一学期').replace('-2', '第二学期')}）
+                        </span>
+                      </div>
+                      <div className="divide-y divide-gray-100">
+                        {lg.records.map((r) => (
+                          <label
+                            key={r.id}
+                            className="flex items-start gap-2.5 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                          >
+                            <Checkbox
+                              checked={pickerSelected.has(r.id)}
+                              onCheckedChange={() => toggleRecord(r.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm text-gray-800 break-words">{r.content}</div>
+                              <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-gray-400">
+                                {r.deadline && <span>截止：{r.deadline}</span>}
+                                {r.mainExecutor && <span>执行人：{r.mainExecutor}</span>}
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-4">
+                <span className="text-sm text-gray-600">已选 {pickerSelected.size} 条</span>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setPickerOpen(false)} className="border-gray-200">
+                    取消
+                  </Button>
+                  <Button onClick={confirmPicker} className="bg-gray-900 hover:bg-gray-800 text-white">
+                    添加到公告
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

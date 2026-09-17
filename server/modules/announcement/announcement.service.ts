@@ -196,6 +196,46 @@ export class AnnouncementService {
     `;
   }
 
+  // 管理员：获取自己所有台账（含学期、类型）及其中的记录，用于发布台账公告时选择
+  async getAdminLedgersWithRecords(userId: string) {
+    const ledgers = await this.sql<Array<{
+      id: string;
+      name: string;
+      ledgerType: string;
+      semester: string;
+    }>>`
+      SELECT id, name, ledger_type as "ledgerType", semester
+      FROM ledger
+      WHERE owner_user_id = ${userId} AND is_deleted = false
+      ORDER BY semester, ledger_type, created_at
+    `;
+    if (ledgers.length === 0) return [];
+    const ledgerIds = ledgers.map((l) => l.id);
+    const records = await this.sql<Array<{
+      id: string;
+      ledgerId: string;
+      content: string;
+      expectedDate: string | null;
+      mainExecutor: string | null;
+    }>>`
+      SELECT id, ledger_id as "ledgerId", content, expected_date as "expectedDate", main_executor as "mainExecutor"
+      FROM ledger_record
+      WHERE ledger_id = ANY(${ledgerIds}::uuid[])
+      ORDER BY ledger_id, seq_no
+    `;
+    return ledgers.map((l) => ({
+      ...l,
+      records: records
+        .filter((r) => r.ledgerId === l.id)
+        .map((r) => ({
+          id: r.id,
+          content: r.content,
+          deadline: r.expectedDate || undefined,
+          mainExecutor: r.mainExecutor || undefined,
+        })),
+    }));
+  }
+
   async claimItems(
     userId: string,
     announcementId: string,

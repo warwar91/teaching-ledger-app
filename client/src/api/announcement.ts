@@ -68,6 +68,19 @@ export const announcementApi = {
     http.delete(`/announcements/${id}`),
   getMyLedgers: () =>
     http.get<UserLedger[]>('/announcements/my-ledgers'),
+  getAdminLedgersWithRecords: () =>
+    http.get<Array<{
+      id: string;
+      name: string;
+      ledgerType: string;
+      semester: string;
+      records: Array<{
+        id: string;
+        content: string;
+        deadline?: string;
+        mainExecutor?: string;
+      }>;
+    }>>('/announcements/admin/my-ledgers-with-records'),
   claimItems: (id: string, data: {
     itemIds: string[];
     targetLedgerId: string;

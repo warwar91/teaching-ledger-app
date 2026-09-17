@@ -44,6 +44,13 @@ export class AnnouncementController {
     return this.announcementService.getUserLedgers(req.user.userId);
   }
 
+  // 管理员：获取自己的台账及记录（用于发布台账公告时选择）
+  @Get('admin/my-ledgers-with-records')
+  @UseGuards(AdminGuard)
+  getAdminLedgersWithRecords(@Req() req: any) {
+    return this.announcementService.getAdminLedgersWithRecords(req.user.userId);
+  }
+
   // 普通用户：查看公告详情
   @Get(':id')
   @UseGuards(JwtAuthGuard)
