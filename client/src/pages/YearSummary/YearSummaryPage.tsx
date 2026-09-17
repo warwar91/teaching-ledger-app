@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FileText, Upload, Download, Trash2, Eye, FolderOpen, MoreVertical, Pencil } from 'lucide-react';
+import { FileText, Upload, Download, Trash2, FolderOpen, MoreVertical, Pencil } from 'lucide-react';
 import { Button } from '@client/src/components/ui/button';
 import { Input } from '@client/src/components/ui/input';
 import {
@@ -45,8 +45,6 @@ const YearSummaryPage: React.FC = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ title: '', file: null as File | null });
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<yearSummaryApi.YearSummaryItem | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [renaming, setRenaming] = useState(false);
@@ -120,11 +118,6 @@ const YearSummaryPage: React.FC = () => {
     } catch (err) {
       toast.error('删除失败');
     }
-  };
-
-  const handlePreview = (url: string) => {
-    setPreviewUrl(url);
-    setPreviewOpen(true);
   };
 
   const openRename = (item: yearSummaryApi.YearSummaryItem) => {
@@ -230,14 +223,6 @@ const YearSummaryPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handlePreview(item.fileUrl)}
-                        className="text-gray-600 hover:bg-gray-100"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
                         onClick={() => window.open(item.fileUrl, '_blank')}
                         className="text-gray-600 hover:bg-gray-100"
                       >
@@ -328,27 +313,6 @@ const YearSummaryPage: React.FC = () => {
               上传
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Preview Dialog */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-5xl h-[85vh]">
-          <DialogHeader>
-            <DialogTitle>文件预览</DialogTitle>
-          </DialogHeader>
-          {previewUrl.endsWith('.pdf') ? (
-            <iframe src={previewUrl} className="w-full flex-1 rounded border border-gray-200" style={{ minHeight: '60vh' }} />
-          ) : (
-            <div className="flex flex-col items-center justify-center py-10">
-              <FileText className="h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-sm text-gray-500 mb-4">Word 文档不支持在线预览，请下载后查看</p>
-              <Button onClick={() => window.open(previewUrl, '_blank')} className="border-gray-300 bg-white hover:bg-gray-50 text-gray-700">
-                <Download className="h-4 w-4 mr-2" />
-                下载文件
-              </Button>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
 
