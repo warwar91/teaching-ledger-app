@@ -234,9 +234,6 @@ const LoginPage: React.FC = () => {
               {loginSubmitting ? '登录中...' : '登录'}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-gray-500">
-            如需开通账号，请联系系统管理员
-          </div>
         </CardContent>
       </Card>
     </div>
