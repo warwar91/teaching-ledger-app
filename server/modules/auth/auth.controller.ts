@@ -7,6 +7,7 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -21,8 +22,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto): Promise<AuthResponse> {
-    return this.authService.register(dto);
+  async register(): Promise<never> {
+    throw new ForbiddenException('系统已关闭自助注册，如需开通账号请联系管理员');
   }
 
   @Post('login')

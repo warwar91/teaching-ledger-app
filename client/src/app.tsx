@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/Layout';
 import NotFound from './pages/NotFound/NotFound';
@@ -22,7 +22,7 @@ const RoutesComponent = () => {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<Navigate to="/login" replace />} />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="weekly" element={<LedgerListPage ledgerType="weekly" />} />

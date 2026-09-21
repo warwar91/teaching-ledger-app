@@ -235,10 +235,7 @@ const LoginPage: React.FC = () => {
             </Button>
           </form>
           <div className="mt-6 text-center text-sm text-gray-500">
-            还没有账号？{' '}
-            <Link to="/register" className="text-blue-600 hover:underline">
-              立即注册
-            </Link>
+            如需开通账号，请联系系统管理员
           </div>
         </CardContent>
       </Card>
